@@ -49,9 +49,11 @@ void myMacro()
     }
   }
 
+  // Efficienza = Accettate (h2) / Generate (h1)
   TH1F *hEff = new TH1F(*h1);
   hEff->SetTitle("hEff");
-  hEff->Divide(h1, h2, 1, 1, "B");
+  hEff->SetName("hEff");
+  hEff->Divide(h2, h1, 1, 1, "B");
 
   TCanvas *canvas = new TCanvas("canvas");
   canvas->Divide(2, 2);
