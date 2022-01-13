@@ -6,8 +6,9 @@
 // secondo una esponenziale decrescente con media 1
 // 4) Si fa la somma dei due istogrammi, e si effettua il fit dell'istogramma somma secondo una forma funzionale consistente di una gaussiana
 // (3 parametri: ampiezza, media e stddev) e un esponenziale (2 parametri), per un totale di 5 parametri liberi
-// 5) Stampa a scherma i parametri dopo il fit con relativo errore, e i X^2 ridotto
+// 5) Stampa a schermo i parametri dopo il fit con relativo errore, e i X^2 ridotto
 
+#include <iostream>
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TH1F.h"
@@ -24,6 +25,7 @@ void setStyle()
   gStyle->SetOptFit(1111);
 }
 
+// Gaus + A*exp{B * x}
 Double_t myFunction(Double_t *x, Double_t *par)
 {
   Double_t xx = x[0];
@@ -58,15 +60,38 @@ void myMacro()
   TH1F *hSum = new TH1F(*h1);
   hSum->Add(h1, h2, 1, 1);
 
-  TF1 *fitFunc = new TF1("fitFunc", myFunction, 0, 5, 5);
-  fitFunc->SetParameters(1, 1, 1, 1, 1);
-  hSum->Fit("fitFunc");
+  TF1 *f = new TF1("f", myFunction, 0, 5, 5);
+  f->SetParameters(1, 1, 1, 1, 1);
 
-  fitFunc->SetLineColor(kRed);
-  fitFunc->SetLineWidth(2);
+  f->SetLineColor(kRed);
+  f->SetLineWidth(1);
 
   TCanvas *canvas = new TCanvas("canvas");
   canvas->cd();
+  hSum->Fit("f");
   hSum->Draw("H");
   hSum->Draw("E, SAME");
+
+  TF1 *fitFunc = hSum->GetFunction("f");
+  Double_t ampiezza = fitFunc->GetParameter(0);
+  Double_t ampiezzaErr = fitFunc->GetParError(0);
+  Double_t media = fitFunc->GetParameter(1);
+  Double_t mediaErr = fitFunc->GetParError(1);
+  Double_t stdDEV = fitFunc->GetParameter(2);
+  Double_t stdDEVErr = fitFunc->GetParError(2);
+  Double_t A = fitFunc->GetParameter(3);
+  Double_t AErr = fitFunc->GetParError(3);
+  Double_t B = fitFunc->GetParameter(4);
+  Double_t BErr = fitFunc->GetParError(4);
+  Double_t chiSquare = fitFunc->GetChisquare();
+  Double_t NDOF = fitFunc->GetNDF();
+
+  std::cout << "***** PARAMETRI FIT *****" << '\n';
+  std::cout << "Ampiezza: " << ampiezza << " +/- " << ampiezzaErr << '\n';
+  std::cout << "Media: " << media << " +/- " << mediaErr << '\n';
+  std::cout << "StdDev: " << stdDEV << " +/- " << stdDEVErr << '\n';
+  std::cout << "A: " << A << " +/- " << AErr << '\n';
+  std::cout << "B: " << B << " +/- " << BErr << '\n';
+  std::cout << "Chi/NDOF: " << chiSquare / NDOF << '\n';
+  std::cout << "**********" << '\n';
 }
