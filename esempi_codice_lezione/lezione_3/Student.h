@@ -1,0 +1,13 @@
+#ifndef STUDENT_H
+#define STUDENT_H
+#include "Person.h"
+class Student : public Person
+{
+public:
+  Student(const char *name, int code);
+  void PrintData() const;
+
+private:
+  int code_;
+};
+#endif
