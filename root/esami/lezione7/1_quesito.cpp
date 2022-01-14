@@ -1,5 +1,5 @@
 // 1) Si definisce un istogramma monodimensionale di 100 bin in un range da 0 a 10
-// 2) Si riempie l'isotgramma con 10^5 occorrenze di una variabile casuale x distribuita secondo la pdf f(x) = x nel range [0,10], utilizzando il metodo
+// 2) Si riempie l'istogramma con 10^5 occorrenze di una variabile casuale x distribuita secondo la pdf f(x) = x nel range [0,10], utilizzando il metodo
 // FillRandom(const char* f, Int_t N)
 
 #include "TH1F.h"

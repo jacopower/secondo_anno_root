@@ -2,7 +2,7 @@
 // 1) Si definiscono 2 istogrammi monodimensionali di 500 bin in un range da 0 a 5.
 // 2) Si riempe il primo istogramma con 10^6 occorrenze generate esplicitamente e singolarmente secondo una distribuzione gaussiana con
 // media 2 e deviazione standard 0.5.
-// 3) Si riempe il secondo istogramma con 105 occorrenze generate esplicitamente e singolarmente secondo una distribuzione
+// 3) Si riempe il secondo istogramma con 10^5 occorrenze generate esplicitamente e singolarmente secondo una distribuzione
 // esponenziale decrescente con media 1
 // 4) Si fa la somma dei due istogrammi, e si effettua il Fit dell’istogramma somma secondo una forma funzionale consistente di
 // una gaussiana (3 parametri) e un esponenziale (2 parametri), per un totale di 5 parametri liberi.
