@@ -1,0 +1,18 @@
+{
+  "files.associations": {
+    "myMacro.C": "cpp",
+    "myMacroSol_V10.C": "cpp",
+    "myMacroSol_V11.C": "cpp",
+    "myMacroSol_V12.C": "cpp",
+    "myMacroSol_V13.C": "cpp",
+    "myMacroSol_V14.C": "cpp",
+    "benchmark.C": "cpp",
+    "efficiency.C": "cpp",
+    "myClassMacro.C": "cpp",
+    "myMacroSol_V15.C": "cpp",
+    "proportions.C": "cpp",
+    "resolution.C": "cpp",
+    "testList.C": "cpp",
+    "testCorrelation.C": "cpp"
+  }
+}
