@@ -57,7 +57,7 @@ void myMacro()
 
   // ***** CREO GRAFICO DEI PUNTI SPERIMENTALI E FACCIO FIT *****
   // VA AGGIUNTO ERRORE ATTRAVERSO LA VARIABILE stdDev
-  TGraphErrors *graph = new TGraphErrors("gaussiana1.txt", "%lg %lg");
+  TGraphErrors *graph = new TGraphErrors("data.txt", "%lg %lg %lg");
   graph->SetTitle("Test Gaussiana; x(UDM); y(UDM)");
   graph->SetMarkerStyle(kOpenCircle);
   graph->SetMarkerColor(kBlue);
@@ -70,14 +70,14 @@ void myMacro()
   graph->Fit(fitFunc);
 
   // ***** CREO GRAFICO DEL RESIDUO *****
-  in.open("gaussiana1.txt");
-  Float_t x, y;
+  in.open("data.txt");
+  Float_t x, y, err;
   Double_t residuo = 0;
   Float_t xRes[Npoints], yRes[Npoints];
 
   for (Int_t i = 0; i < Npoints; ++i)
   {
-    in >> x >> y;
+    in >> x >> y >> err;
     residuo = y - (fitFunc->Eval(x));
     xRes[i] = x;
     yRes[i] = residuo;
