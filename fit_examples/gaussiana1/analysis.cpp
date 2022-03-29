@@ -29,10 +29,8 @@ Double_t myGaus(Double_t *x, Double_t *par)
   return val;
 }
 
-void myMacro()
+void computeRMS()
 {
-  constexpr int Npoints = 100;
-
   // ***** CALCOLO DEVIAZIONE STANDARD DEL RUMORE *****
   TH1F *stdHisto = new TH1F("stdHisto", "Rumore", 100, -0.2, 0.2);
   std::ifstream in;
@@ -55,8 +53,15 @@ void myMacro()
             << "Deviazione Standard: " << stdDev << '\n'
             << "**********" << '\n';
 
+  TCanvas *cRMS = new TCanvas("cRMS");
+  stdHisto->Draw();
+}
+
+void analyse()
+{
+  constexpr int Npoints = 100;
+
   // ***** CREO GRAFICO DEI PUNTI SPERIMENTALI E FACCIO FIT *****
-  // VA AGGIUNTO ERRORE ATTRAVERSO LA VARIABILE stdDev
   TGraphErrors *graph = new TGraphErrors("data.txt", "%lg %lg %lg");
   graph->SetTitle("Test Gaussiana; x(UDM); y(UDM)");
   graph->SetMarkerStyle(kOpenCircle);
@@ -65,11 +70,13 @@ void myMacro()
 
   TF1 *fitFunc = new TF1("fitFunc", myGaus, -10, 10, 3);
   fitFunc->SetParameters(1, 1, 1); // settati a caso
+  fitFunc->SetParNames("Altezza", "Centro", "Sigma");
   fitFunc->SetLineColor(kRed);
   fitFunc->SetLineStyle(2);
   graph->Fit(fitFunc);
 
   // ***** CREO GRAFICO DEL RESIDUO *****
+  std::ifstream in;
   in.open("data.txt");
   Float_t x, y, err;
   Double_t residuo = 0;
@@ -84,6 +91,9 @@ void myMacro()
   }
   in.close();
   TGraph *residueGraph = new TGraph(Npoints, xRes, yRes);
+
+  residueGraph->SetMarkerStyle(kOpenCircle);
+  residueGraph->SetMarkerColor(kGreen);
 
   // ***** LEGENDA E CANVAS *****
   TLegend *leg = new TLegend(.1, .7, .3, .9, "Dati Laboratorio");
@@ -100,7 +110,7 @@ void myMacro()
   pad1->SetGridx();         // Vertical grid
   pad1->Draw();             // Draw the upper pad: pad1
   pad1->cd();               // pad1 becomes the current pad
-  graph->Draw();
+  graph->Draw("APE");
   leg->Draw("Same");
 
   // ***** PAD 2 - LOWER PLOT *****
@@ -112,4 +122,10 @@ void myMacro()
   pad2->Draw();
   pad2->cd(); // pad2 becomes the current pad
   residueGraph->Draw();
+
+  // ***** ALTRO PLOT DEL RESIDUO *****
+  TCanvas *c2 = new TCanvas("c2", "canvas", 800, 800);
+  graph->Draw("APE");
+  leg->Draw("Same");
+  residueGraph->Draw("PSame");
 }
