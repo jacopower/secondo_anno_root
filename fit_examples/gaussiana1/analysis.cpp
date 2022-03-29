@@ -31,8 +31,9 @@ Double_t myGaus(Double_t *x, Double_t *par)
 
 void computeRMS()
 {
+  constexpr int N = 100;
   // ***** CALCOLO DEVIAZIONE STANDARD DEL RUMORE *****
-  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", 100, -0.2, 0.2);
+  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", N, -0.2, 0.2);
   std::ifstream in;
   in.open("rumore.txt");
   Float_t rumore;
@@ -51,6 +52,8 @@ void computeRMS()
   std::cout << '\n'
             << " ***** DEVIAZIONE STANDARD RUMORE *****" << '\n'
             << "Deviazione Standard: " << stdDev << '\n'
+            << "Underflows: " << stdHisto->GetBinContent(0) << '\n'
+            << "Overflows: " << stdHisto->GetBinContent(N+1) << '\n'
             << "**********" << '\n';
 
   TCanvas *cRMS = new TCanvas("cRMS");
@@ -68,12 +71,12 @@ void analyse()
   graph->SetMarkerColor(kBlue);
   graph->SetFillColor(0);
 
-  TF1 *fitFunc = new TF1("fitFunc", myGaus, -10, 10, 3);
+  TF1 *fitFunc = new TF1("fitFunc", myGaus, -5, 5, 3);
   fitFunc->SetParameters(1, 1, 1); // settati a caso
   fitFunc->SetParNames("Altezza", "Centro", "Sigma");
   fitFunc->SetLineColor(kRed);
   fitFunc->SetLineStyle(2);
-  graph->Fit(fitFunc);
+  graph->Fit(fitFunc, "R");
 
   // ***** CREO GRAFICO DEL RESIDUO *****
   std::ifstream in;
