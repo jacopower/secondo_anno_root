@@ -11,6 +11,11 @@
 #include <fstream>
 #include <iostream>
 
+/*
+***** PROBLEMI *****
+IL FIT VISIVAMENTE BUONO  HA CHIQUADRO ALTRISSIMO, PROBLEMA CON CALCOLO DELL'ERRORE?
+*/
+
 void setStyle()
 {
   gROOT->SetStyle("Plain");
@@ -20,40 +25,36 @@ void setStyle()
   gStyle->SetOptFit(1111);
 }
 
-Double_t myGaus(Double_t *x, Double_t *par)
-{
-  // par[0] = h, par[1] = x0, par[2] = sigma
-  Double_t xx = x[0];
-  Double_t val = (xx > 20 && xx < 25) * par[0] * TMath::Exp(-(xx - par[1]) * (xx - par[1]) / 2. / par[2] / par[2]);
-  return val;
-}
 
 void computeRMS()
 {
-  TH1F *rumoreHisto = new TH1F("rumoreHisto", "Rumore", 100, -5, 5);
-  std::ifstream inRumore;
-  inRumore.open("rumore.txt");
+  constexpr int N = 100;
+  // ***** CALCOLO DEVIAZIONE STANDARD DEL RUMORE *****
+  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", N, -0.2, 0.2);
+  std::ifstream in;
+  in.open("rumore.txt");
   Float_t rumore;
   while (1)
   {
-    inRumore >> rumore;
-    if (!inRumore.good())
+    in >> rumore;
+    if (!in.good())
     {
       break;
     }
-    rumoreHisto->Fill(rumore);
+    stdHisto->Fill(rumore);
   }
-  inRumore.close();
+  in.close();
 
-  Double_t stdDev = rumoreHisto->GetRMS();
+  Double_t stdDev = stdHisto->GetStdDev();
   std::cout << '\n'
             << " ***** DEVIAZIONE STANDARD RUMORE *****" << '\n'
             << "Deviazione Standard: " << stdDev << '\n'
+            << "Underflows: " << stdHisto->GetBinContent(0) << '\n'
+            << "Overflows: " << stdHisto->GetBinContent(N+1) << '\n'
             << "**********" << '\n';
 
-  TCanvas *rumoreCanvas = new TCanvas("rumoreCanvas");
-  rumoreCanvas->cd();
-  rumoreHisto->Draw();
+  TCanvas *cRMS = new TCanvas("cRMS");
+  stdHisto->Draw();
 }
 
 void analyse()
