@@ -20,9 +20,20 @@ void setStyle()
   gStyle->SetOptFit(1111);
 }
 
+Double_t myFunc(Double_t *x, Double_t *par)
+{
+  // par[0] = h, par[1] = x0, par[2] = sigma
+  Double_t xx = x[0];
+  Double_t val = par[0] * sin(par[1] * xx + par[2]);
+  return val;
+}
+
+
 void computeRMS()
 {
-  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", 100, -100, 100);
+  constexpr int N = 100;
+  // ***** CALCOLO DEVIAZIONE STANDARD DEL RUMORE *****
+  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", N, -100, 100);
   std::ifstream in;
   in.open("rumore.txt");
   Float_t rumore;
@@ -41,12 +52,14 @@ void computeRMS()
   std::cout << '\n'
             << " ***** DEVIAZIONE STANDARD RUMORE *****" << '\n'
             << "Deviazione Standard: " << stdDev << '\n'
+            << "Underflows: " << stdHisto->GetBinContent(0) << '\n'
+            << "Overflows: " << stdHisto->GetBinContent(N+1) << '\n'
             << "**********" << '\n';
 
   TCanvas *cRMS = new TCanvas("cRMS");
-  cRMS->cd();
   stdHisto->Draw();
 }
+
 
 void analyse()
 {
@@ -56,12 +69,11 @@ void analyse()
   graph->SetMarkerColor(kBlue);
   graph->SetFillColor(0);
 
-  TF1 *fitFunc = new TF1("fitFunc", "[0] * x * sin([1] * x)", -50, 940);
-  fitFunc->SetParameters(400, 200, 1);
+  TF1 *fitFunc = new TF1("fitFunc", myFunc, -50, 940, 3);
+  fitFunc->SetParameters(400, 0.025, 200);
   fitFunc->SetLineColor(kRed);
   graph->Fit("fitFunc", "R");
 
   TCanvas *canvas = new TCanvas("canvas");
   graph->Draw("APE");
-  // graph->Fit(fitFunc);
 }
