@@ -24,7 +24,7 @@ Double_t myFunc(Double_t *x, Double_t *par)
 {
   // par[0] = h, par[1] = x0, par[2] = sigma
   Double_t xx = x[0];
-  Double_t val = par[0] * sin(par[1] * xx + par[2]);
+  Double_t val = par[0] * sin(par[1] * xx + par[2]) + par[3];
   return val;
 }
 
@@ -69,8 +69,8 @@ void analyse()
   graph->SetMarkerColor(kBlue);
   graph->SetFillColor(0);
 
-  TF1 *fitFunc = new TF1("fitFunc", myFunc, -50, 940, 3);
-  fitFunc->SetParameters(400, 0.025, 200);
+  TF1 *fitFunc = new TF1("fitFunc", myFunc, -50, 940, 1);
+  fitFunc->SetParameters(400, 0.025, 200, 1);
   fitFunc->SetLineColor(kRed);
   graph->Fit("fitFunc", "R");
 
