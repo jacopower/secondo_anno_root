@@ -69,8 +69,8 @@ void analyse()
   graph->SetMarkerColor(kBlue);
   graph->SetFillColor(0);
 
-  TF1 *fitFunc = new TF1("fitFunc", myFunc, -50, 940, 1);
-  fitFunc->SetParameters(400, 0.025, 200, 1);
+  TF1 *fitFunc = new TF1("fitFunc", myFunc, -50, 940, 4);
+  fitFunc->SetParameters(350, 0.015, 90, 50);
   fitFunc->SetLineColor(kRed);
   graph->Fit("fitFunc", "R");
 
