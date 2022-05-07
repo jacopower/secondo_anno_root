@@ -20,6 +20,42 @@ void setStyle()
   gStyle->SetOptFit(1111);
 }
 
+Double_t freq_time_resistenza(Double_t *x, Double_t *par)
+{
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  // par[4] = W
+  Double_t xx = x[0];
+  Double_t val = par[1] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[4] * par[1] * par[3]))) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  return val;
+}
+
+Double_t freq_time_induttanza(Double_t *x, Double_t *par)
+{
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  // par[4] = W
+  Double_t xx = x[0];
+  Double_t val = par[4] * par[2] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1])) + TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  return val;
+}
+
+Double_t freq_time_condensatore(Double_t *x, Double_t *par)
+{
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  // par[4] = W
+  Double_t xx = x[0];
+  Double_t val = par[0] / par[4] / par[3] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1])) - TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  return val;
+}
+
 void computeRMS()
 {
   constexpr int N = 1000;
@@ -69,7 +105,7 @@ void computeRMS()
 
   Double_t stdDev = stdHisto->GetStdDev();
   std::cout << '\n'
-            << " ***** DEVIAZIONE STANDARD RUMORE *****" << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 1k *****" << '\n'
             << "Deviazione Standard: " << stdDev << '\n'
             << "Underflows: " << stdHisto->GetBinContent(0) << '\n'
             << "Overflows: " << stdHisto->GetBinContent(N + 1) << '\n'
@@ -101,4 +137,42 @@ void computeRMS()
   TCanvas *c2 = new TCanvas("c2");
   c2->cd();
   ampiezza10kHisto->Draw();
+}
+
+void sweep()
+{
+  TGraphErrors *graphResistenza = new TGraphErrors("sweep_freq_resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
+  graphResistenza->SetMarkerStyle(kOpenCircle);
+  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetFillColor(0);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("sweep_freq_induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Sweep Induttanza; x(UDM); y(UDM)");
+  graphInduttanza->SetMarkerStyle(kOpenCircle);
+  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetFillColor(0);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("sweep_freq_condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Sweep Condensatore; x(UDM); y(UDM)");
+  graphCondensatore->SetMarkerStyle(kOpenCircle);
+  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetFillColor(0);
+
+  TGraphErrors *graphTotale = new TGraphErrors("sweep_freq_totale.txt", "%lg %lg %lg");
+  graphTotale->SetTitle("Sweep Totale; x(UDM); y(UDM)");
+  graphTotale->SetMarkerStyle(kOpenCircle);
+  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetFillColor(0);
+
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(2, 2);
+  c1->cd(1);
+  graphResistenza->Draw("APE");
+  c1->cd(2);
+  graphInduttanza->Draw("APE");
+  c1->cd(3);
+  graphCondensatore->Draw("APE");
+  c1->cd(4);
+  graphTotale->Draw("APE");
 }
