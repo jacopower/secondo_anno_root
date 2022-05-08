@@ -15,12 +15,11 @@
 // C = 158.4 nF
 // L = 10.43 mH
 
-
 void setStyle()
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(57);
-  gStyle->SetOptTitle(0);
+  gStyle->SetOptTitle(1);
   gStyle->SetOptStat(112210);
   gStyle->SetOptFit(1111);
 }
@@ -61,28 +60,31 @@ Double_t freq_time_condensatore(Double_t *x, Double_t *par)
   return val;
 }
 
-void computeRMS()
+void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
 {
-  constexpr int N = 1000;
-  // ***** CALCOLO DEVIAZIONE STANDARD DEL RUMORE *****
-  TH1F *stdHisto = new TH1F("stdHisto", "Rumore", N, -5.0, -4.8);
-  TH1F *ampiezza4kHisto = new TH1F("ampiezza4kHisto", "Rumore", N, 4.9, 5.1);
-  TH1F *ampiezza10kHisto = new TH1F("ampiezza10kHisto", "Rumore", N, 4.9, 5.1);
-  std::ifstream in;
-  in.open("rumore.txt");
-  Float_t rumore;
+  constexpr int N = 1000; // VEDI QUESTO
+  TH1F *histo1k = new TH1F("histo1k", "Rumore a 1kHz", N, 4.9, 5.1);
+  TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
+  TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
+
+  std::ifstream in; // VA BENE SE APRO E CHIUDO QUESTO?
+
+  // LEGGO RUMORE A 1K
+  in.open("data/rumore/ampiezza1k.txt");
+  Float_t ampiezza1k;
   while (1)
   {
-    in >> rumore;
+    in >> ampiezza1k;
     if (!in.good())
     {
       break;
     }
-    stdHisto->Fill(rumore);
+    histo1k->Fill(ampiezza1k);
   }
   in.close();
 
-  in.open("ampiezza4k.txt");
+  // LEGGO RUMORE A 4K
+  in.open("data/rumore/ampiezza4k.txt");
   Float_t ampiezza4k;
   while (1)
   {
@@ -91,11 +93,12 @@ void computeRMS()
     {
       break;
     }
-    ampiezza4kHisto->Fill(ampiezza4k);
+    histo4k->Fill(ampiezza4k);
   }
   in.close();
 
-  in.open("ampiezza10k.txt");
+  // LEGGO RUMORE A 10K
+  in.open("data/rumore/ampiezza10k.txt");
   Float_t ampiezza10k;
   while (1)
   {
@@ -104,44 +107,44 @@ void computeRMS()
     {
       break;
     }
-    ampiezza10kHisto->Fill(ampiezza10k);
+    histo10k->Fill(ampiezza10k);
   }
   in.close();
 
-  Double_t stdDev = stdHisto->GetStdDev();
+  // STAMPO LE DEVIAZIONI STANDARD
+  Double_t ampiezza1kDev = histo1k->GetStdDev();
   std::cout << '\n'
-            << " ***** DEVIAZIONE STANDARD RUMORE 1k *****" << '\n'
-            << "Deviazione Standard: " << stdDev << '\n'
-            << "Underflows: " << stdHisto->GetBinContent(0) << '\n'
-            << "Overflows: " << stdHisto->GetBinContent(N + 1) << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 1kHz *****" << '\n'
+            << "Deviazione Standard: " << ampiezza1kDev << '\n'
+            << "Underflows: " << histo1k->GetBinContent(0) << '\n'
+            << "Overflows: " << histo1k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
-  Double_t ampiezza4kDev = ampiezza4kHisto->GetStdDev();
+  Double_t ampiezza4kDev = histo4k->GetStdDev();
   std::cout << '\n'
-            << " ***** DEVIAZIONE STANDARD AMPIEZZA 4k *****" << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 4kHz *****" << '\n'
             << "Deviazione Standard: " << ampiezza4kDev << '\n'
-            << "Underflows: " << ampiezza4kHisto->GetBinContent(0) << '\n'
-            << "Overflows: " << ampiezza4kHisto->GetBinContent(N + 1) << '\n'
+            << "Underflows: " << histo4k->GetBinContent(0) << '\n'
+            << "Overflows: " << histo4k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
-  Double_t ampiezza10kDev = ampiezza10kHisto->GetStdDev();
+  Double_t ampiezza10kDev = histo10k->GetStdDev();
   std::cout << '\n'
-            << " ***** DEVIAZIONE STANDARD AMPIEZZA 10k *****" << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 10kHz *****" << '\n'
             << "Deviazione Standard: " << ampiezza10kDev << '\n'
-            << "Underflows: " << ampiezza10kHisto->GetBinContent(0) << '\n'
-            << "Overflows: " << ampiezza10kHisto->GetBinContent(N + 1) << '\n'
+            << "Underflows: " << histo10k->GetBinContent(0) << '\n'
+            << "Overflows: " << histo10k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
-  TCanvas *cRMS = new TCanvas("cRMS");
-  cRMS->Divide(1, 2);
-  cRMS->cd(1);
-  stdHisto->Draw();
-  cRMS->cd(2);
-  ampiezza4kHisto->Draw();
-
-  TCanvas *c2 = new TCanvas("c2");
-  c2->cd();
-  ampiezza10kHisto->Draw();
+  // PLOT ISTOGRAMMI
+  TCanvas *c = new TCanvas;
+  c->Divide(2,2);
+  c->cd(1);
+  histo1k->Draw();
+  c->cd(2);
+  histo4k->Draw();
+  c->cd(3);
+  histo10k->Draw();
 }
 
 void amplitude_sweep()
@@ -218,13 +221,4 @@ void phase_sweep()
   graphCondensatore->Draw("APE");
   c1->cd(4);
   graphTotale->Draw("APE");
-}
-
-void tensioni_tempo()
-{
-  TGraphErrors *graph1 = new TGraphErrors("tensione1.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
-  graphResistenza->SetMarkerStyle(kOpenCircle);
-  graphResistenza->SetMarkerColor(kBlue);
-  graphResistenza->SetFillColor(0);
 }
