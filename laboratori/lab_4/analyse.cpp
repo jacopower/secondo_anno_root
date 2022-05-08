@@ -24,8 +24,9 @@ void setStyle()
   gStyle->SetOptFit(1111);
 }
 
-Double_t freq_time_resistenza(Double_t *x, Double_t *par)
+Double_t amp_time_resistenza(Double_t *x, Double_t *par)
 {
+  // 5 PARAMETRI
   // par[0] = V0
   // par[1] = R
   // par[2] = L
@@ -36,33 +37,105 @@ Double_t freq_time_resistenza(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t freq_time_induttanza(Double_t *x, Double_t *par)
+Double_t amp_time_induttanza(Double_t *x, Double_t *par)
 {
+  // 5 PARAMETRI
   // par[0] = V0
   // par[1] = R
   // par[2] = L
   // par[3] = C
   // par[4] = W
   Double_t xx = x[0];
-  Double_t val = par[4] * par[2] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1])) + TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  Double_t val = par[4] * par[2] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1] * par[4] * par[3])) + TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
   return val;
 }
 
-Double_t freq_time_condensatore(Double_t *x, Double_t *par)
+Double_t amp_time_condensatore(Double_t *x, Double_t *par)
 {
+  // 5 PARAMETRI
   // par[0] = V0
   // par[1] = R
   // par[2] = L
   // par[3] = C
   // par[4] = W
   Double_t xx = x[0];
-  Double_t val = par[0] / par[4] / par[3] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1])) - TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  Double_t val = par[0] / par[4] / par[3] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1] * par[4] * par[3])) - TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  return val;
+}
+
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+  return val;
+}
+
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = xx * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+  return val;
+}
+
+Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = par[0] / xx / par[3] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+      return val;
+}
+
+Double_t phase_freq_resistenza(Double_t *x, Double_t *par)
+{
+  // 3 PARAMETRI
+  // par[0] = R
+  // par[1] = L
+  // par[2] = C
+  Double_t xx = x[0];
+  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2]));
+  return val;
+}
+
+Double_t phase_freq_induttanza(Double_t *x, Double_t *par)
+{
+  // 3 PARAMETRI
+  // par[0] = R
+  // par[1] = L
+  // par[2] = C
+  Double_t xx = x[0];
+  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2])) + TMath::PiOver2();
+  return val;
+}
+
+Double_t phase_freq_condensatore(Double_t *x, Double_t *par)
+{
+  // 3 PARAMETRI
+  // par[0] = R
+  // par[1] = L
+  // par[2] = C
+  Double_t xx = x[0];
+  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2])) - TMath::PiOver2();
   return val;
 }
 
 void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
 {
   constexpr int N = 1000; // VEDI QUESTO
+  TH1F *histoOndaQuadra = new TH1F("histoOndaQuadra", "Rumore con Onda Quadra", N, 4.9, 5.1);
   TH1F *histo1k = new TH1F("histo1k", "Rumore a 1kHz", N, 4.9, 5.1);
   TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
   TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
@@ -111,6 +184,20 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   }
   in.close();
 
+  // LEGGO RUMORE ONDA QUADRA
+  in.open("data/rumore/rumore_onda_quadra.txt");
+  Float_t ampiezzaOndaQuadra;
+  while (1)
+  {
+    in >> ampiezzaOndaQuadra;
+    if (!in.good())
+    {
+      break;
+    }
+    histoOndaQuadra->Fill(ampiezzaOndaQuadra);
+  }
+  in.close();
+
   // STAMPO LE DEVIAZIONI STANDARD
   Double_t ampiezza1kDev = histo1k->GetStdDev();
   std::cout << '\n'
@@ -136,38 +223,49 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
             << "Overflows: " << histo10k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
+  Double_t ampiezzaOndaQuadraDev = histoOndaQuadra->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE ONDA QUADRA (CIRCUITO VUOTO) *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaOndaQuadraDev << '\n'
+            << "Underflows: " << histoOndaQuadra->GetBinContent(0) << '\n'
+            << "Overflows: " << histoOndaQuadra->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
   // PLOT ISTOGRAMMI
   TCanvas *c = new TCanvas;
-  c->Divide(2,2);
+  c->Divide(2, 2);
   c->cd(1);
   histo1k->Draw();
   c->cd(2);
   histo4k->Draw();
   c->cd(3);
   histo10k->Draw();
+  c->cd(4);
+  histoOndaQuadra->Draw();
 }
 
+// CHE ERRORE SU Y ASSOCIARE QUI?
 void amplitude_sweep()
 {
-  TGraphErrors *graphResistenza = new TGraphErrors("sweep_freq_resistenza.txt", "%lg %lg %lg");
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
   graphResistenza->SetMarkerStyle(kOpenCircle);
   graphResistenza->SetMarkerColor(kBlue);
   graphResistenza->SetFillColor(0);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("sweep_freq_induttanza.txt", "%lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; x(UDM); y(UDM)");
   graphInduttanza->SetMarkerStyle(kOpenCircle);
   graphInduttanza->SetMarkerColor(kBlue);
   graphInduttanza->SetFillColor(0);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("sweep_freq_condensatore.txt", "%lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; x(UDM); y(UDM)");
   graphCondensatore->SetMarkerStyle(kOpenCircle);
   graphCondensatore->SetMarkerColor(kBlue);
   graphCondensatore->SetFillColor(0);
 
-  TGraphErrors *graphTotale = new TGraphErrors("sweep_freq_totale.txt", "%lg %lg %lg");
+  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; x(UDM); y(UDM)");
   graphTotale->SetMarkerStyle(kOpenCircle);
   graphTotale->SetMarkerColor(kBlue);
@@ -185,27 +283,28 @@ void amplitude_sweep()
   graphTotale->Draw("APE");
 }
 
+// CHE ERRORE SU Y ASSOCIARE QUI?
 void phase_sweep()
 {
-  TGraphErrors *graphResistenza = new TGraphErrors("sweep_phase_resistenza.txt", "%lg %lg %lg");
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
   graphResistenza->SetMarkerStyle(kOpenCircle);
   graphResistenza->SetMarkerColor(kBlue);
   graphResistenza->SetFillColor(0);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("sweep_phase_induttanza.txt", "%lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; x(UDM); y(UDM)");
   graphInduttanza->SetMarkerStyle(kOpenCircle);
   graphInduttanza->SetMarkerColor(kBlue);
   graphInduttanza->SetFillColor(0);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("sweep_phase_condensatore.txt", "%lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; x(UDM); y(UDM)");
   graphCondensatore->SetMarkerStyle(kOpenCircle);
   graphCondensatore->SetMarkerColor(kBlue);
   graphCondensatore->SetFillColor(0);
 
-  TGraphErrors *graphTotale = new TGraphErrors("sweep_phase_totale.txt", "%lg %lg %lg");
+  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_fase/sweep_phase_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; x(UDM); y(UDM)");
   graphTotale->SetMarkerStyle(kOpenCircle);
   graphTotale->SetMarkerColor(kBlue);
