@@ -96,7 +96,7 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
   // par[3] = C
   Double_t xx = x[0];
   Double_t val = par[0] / xx / par[3] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
-      return val;
+  return val;
 }
 
 Double_t phase_freq_resistenza(Double_t *x, Double_t *par)
@@ -139,6 +139,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   TH1F *histo1k = new TH1F("histo1k", "Rumore a 1kHz", N, 4.9, 5.1);
   TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
   TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
+  TH1F *histoFase = new TH1F("histoFase", "Rumore Fase", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
 
   std::ifstream in; // VA BENE SE APRO E CHIUDO QUESTO?
 
@@ -198,6 +199,20 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   }
   in.close();
 
+  // LEGGO RUMORE FASE
+  in.open("data/rumore/rumore_fase.txt");
+  Float_t ampiezzaFase;
+  while (1)
+  {
+    in >> ampiezzaFase;
+    if (!in.good())
+    {
+      break;
+    }
+    histoFase->Fill(ampiezzaFase);
+  }
+  in.close();
+
   // STAMPO LE DEVIAZIONI STANDARD
   Double_t ampiezza1kDev = histo1k->GetStdDev();
   std::cout << '\n'
@@ -231,6 +246,14 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
             << "Overflows: " << histoOndaQuadra->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
+  Double_t ampiezzaFaseDev = histoFase->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev << '\n'
+            << "Underflows: " << histoFase->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
   // PLOT ISTOGRAMMI
   TCanvas *c = new TCanvas;
   c->Divide(2, 2);
@@ -242,6 +265,10 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   histo10k->Draw();
   c->cd(4);
   histoOndaQuadra->Draw();
+
+  TCanvas *c2 = new TCanvas;
+  c2->cd();
+  histoFase->Draw();
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
