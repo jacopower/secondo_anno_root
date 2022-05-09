@@ -10,6 +10,7 @@
 #include "TPad.h"
 #include <fstream>
 #include <iostream>
+#include "TMultiGraph.h"
 
 // R = 149.83 Ohm
 // C = 158.4 nF
@@ -308,6 +309,16 @@ void amplitude_sweep()
   graphCondensatore->Draw("APE");
   c1->cd(4);
   graphTotale->Draw("APE");
+
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiCanvas->BuildLegend();; // Vedi cosa fa
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
@@ -347,4 +358,14 @@ void phase_sweep()
   graphCondensatore->Draw("APE");
   c1->cd(4);
   graphTotale->Draw("APE");
+
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiCanvas->BuildLegend();; // Vedi cosa fa
 }
