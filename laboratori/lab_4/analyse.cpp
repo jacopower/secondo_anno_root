@@ -12,6 +12,11 @@
 #include <iostream>
 #include "TMultiGraph.h"
 
+constexpr Double_t R_mis = 149.83; 
+constexpr Double_t L_mis = 10.43 * 1E-3; 
+constexpr Double_t C_mis = 158.4 * 1E-9; 
+constexpr Double_t V0_mis = 5.; 
+
 // R = 149.83 Ohm
 // C = 158.4 nF
 // L = 10.43 mH
@@ -34,7 +39,7 @@ Double_t amp_time_resistenza(Double_t *x, Double_t *par)
   // par[3] = C
   // par[4] = W
   Double_t xx = x[0];
-  Double_t val = par[1] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[4] * par[1] * par[3]))) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  Double_t val = par[1] * par[0] * TMath::Cos(par[4] / TMath::Pi() / 2 * xx + TMath::ATan((1 - par[4] / TMath::Pi() / 2 * par[4] / TMath::Pi() / 2 * par[2] * par[3]) / (par[4] / TMath::Pi() / 2 * par[1] * par[3]))) / TMath::Sqrt(par[1] * par[1] + (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])) * (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
@@ -47,7 +52,7 @@ Double_t amp_time_induttanza(Double_t *x, Double_t *par)
   // par[3] = C
   // par[4] = W
   Double_t xx = x[0];
-  Double_t val = par[4] * par[2] * par[0] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1] * par[4] * par[3])) + TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  Double_t val = par[4] / TMath::Pi() / 2 * par[2] * par[0] * TMath::Cos(par[4] / TMath::Pi() / 2 * xx + TMath::ATan((1 - par[4] / TMath::Pi() / 2 * par[4] / TMath::Pi() / 2 * par[2] * par[3]) / (par[1] * par[4] / TMath::Pi() / 2 * par[3])) + TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])) * (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
@@ -60,11 +65,11 @@ Double_t amp_time_condensatore(Double_t *x, Double_t *par)
   // par[3] = C
   // par[4] = W
   Double_t xx = x[0];
-  Double_t val = par[0] / par[4] / par[3] * TMath::Cos(par[4] * xx + TMath::ATan((1 - par[4] * par[4] * par[2] * par[3]) / (par[1] * par[4] * par[3])) - TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] * par[2] - 1 / (par[4] * par[3])) * (par[4] * par[2] - 1 / (par[4] * par[3])));
+  Double_t val = par[0] / par[4] / TMath::Pi() / 2 / par[3] * TMath::Cos(par[4] / TMath::Pi() / 2 * xx + TMath::ATan((1 - par[4] / TMath::Pi() / 2 * par[4] / TMath::Pi() / 2 * par[2] * par[3]) / (par[1] * par[4] / TMath::Pi() / 2 * par[3])) - TMath::PiOver2()) / TMath::Sqrt(par[1] * par[1] + (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])) * (par[4] / TMath::Pi() / 2 * par[2] - 1 / (par[4] / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
-Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = W / (2 pi)
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -72,11 +77,11 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi 
   // par[2] = L
   // par[3] = C
   Double_t xx = x[0];
-  Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+  Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])) * (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
-Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -84,7 +89,7 @@ Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi 
   // par[2] = L
   // par[3] = C
   Double_t xx = x[0];
-  Double_t val = xx * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+  Double_t val = xx / TMath::Pi() / 2 * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])) * (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
@@ -96,7 +101,7 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' W NON f = 2 * p
   // par[2] = L
   // par[3] = C
   Double_t xx = x[0];
-  Double_t val = par[0] / xx / par[3] / TMath::Sqrt(par[1] * par[1] + (xx * par[2] - 1 / (xx * par[3])) * (xx * par[2] - 1 / (xx * par[3])));
+  Double_t val = par[0] / xx / TMath::Pi() / 2 / par[3] / TMath::Sqrt(par[1] * par[1] + (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])) * (xx / TMath::Pi() / 2 * par[2] - 1 / (xx / TMath::Pi() / 2 * par[3])));
   return val;
 }
 
@@ -107,7 +112,7 @@ Double_t phase_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = 2 * p
   // par[1] = L
   // par[2] = C
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2]));
+  Double_t val = TMath::ATan((1 - xx / TMath::Pi() / 2 * xx / TMath::Pi() / 2 * par[1] * par[2]) / (xx / TMath::Pi() / 2 * par[0] * par[2]));
   return val;
 }
 
@@ -118,7 +123,7 @@ Double_t phase_freq_induttanza(Double_t *x, Double_t *par) // E' W NON f = 2 * p
   // par[1] = L
   // par[2] = C
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2])) + TMath::PiOver2();
+  Double_t val = TMath::ATan((1 - xx / TMath::Pi() / 2 * xx / TMath::Pi() / 2 * par[1] * par[2]) / (xx / TMath::Pi() / 2 * par[0] * par[2])) + TMath::PiOver2();
   return val;
 }
 
@@ -129,7 +134,7 @@ Double_t phase_freq_condensatore(Double_t *x, Double_t *par) // E' W NON f = 2 *
   // par[1] = L
   // par[2] = C
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * xx * par[1] * par[2]) / (xx * par[0] * par[2])) - TMath::PiOver2();
+  Double_t val = TMath::ATan((1 - xx / TMath::Pi() / 2 * xx / TMath::Pi() / 2 * par[1] * par[2]) / (xx / TMath::Pi() / 2 * par[0] * par[2])) - TMath::PiOver2();
   return val;
 }
 
@@ -299,6 +304,13 @@ void amplitude_sweep()
   graphTotale->SetMarkerColor(kBlue);
   graphTotale->SetFillColor(0);
 
+  // ***** CREO LE FUNZIONI DI FIT *****
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 0, 2E4, 4);
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 0, 2E4, 4);
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 0, 2E4, 4);
+  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+  // ***** FINE PARTE FIT *****
+
   TCanvas *c1 = new TCanvas();
   c1->Divide(2, 2);
   c1->cd(1);
@@ -318,7 +330,8 @@ void amplitude_sweep()
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA DA LP?
-  multiCanvas->BuildLegend();; // Vedi cosa fa
+  multiCanvas->BuildLegend();
+  ; // Vedi cosa fa
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
@@ -348,6 +361,10 @@ void phase_sweep()
   graphTotale->SetMarkerColor(kBlue);
   graphTotale->SetFillColor(0);
 
+  // ***** CREO LE FUNZIONI DI FIT *****
+
+  // ***** FINE PARTE FIT *****
+
   TCanvas *c1 = new TCanvas();
   c1->Divide(2, 2);
   c1->cd(1);
@@ -367,7 +384,8 @@ void phase_sweep()
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA DA LP?
-  multiCanvas->BuildLegend();; // Vedi cosa fa
+  multiCanvas->BuildLegend();
+  ; // Vedi cosa fa
 }
 
 void amplitude_time()
@@ -415,5 +433,6 @@ void amplitude_time()
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA DA LP?
-  multiCanvas->BuildLegend();; // Vedi cosa fa
+  multiCanvas->BuildLegend();
+  ; // Vedi cosa fa
 }
