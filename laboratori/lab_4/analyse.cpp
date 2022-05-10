@@ -64,7 +64,7 @@ Double_t amp_time_condensatore(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -76,7 +76,7 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -88,7 +88,7 @@ Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
+Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -100,7 +100,7 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t phase_freq_resistenza(Double_t *x, Double_t *par)
+Double_t phase_freq_resistenza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 3 PARAMETRI
   // par[0] = R
@@ -111,7 +111,7 @@ Double_t phase_freq_resistenza(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t phase_freq_induttanza(Double_t *x, Double_t *par)
+Double_t phase_freq_induttanza(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 3 PARAMETRI
   // par[0] = R
@@ -122,7 +122,7 @@ Double_t phase_freq_induttanza(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t phase_freq_condensatore(Double_t *x, Double_t *par)
+Double_t phase_freq_condensatore(Double_t *x, Double_t *par) // E' W NON f = 2 * pi * W
 {
   // 3 PARAMETRI
   // par[0] = R
@@ -276,25 +276,25 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
 void amplitude_sweep()
 {
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
+  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
   graphResistenza->SetMarkerStyle(kOpenCircle);
   graphResistenza->SetMarkerColor(kBlue);
   graphResistenza->SetFillColor(0);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Sweep Induttanza; x(UDM); y(UDM)");
+  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Amplitude (V)");
   graphInduttanza->SetMarkerStyle(kOpenCircle);
   graphInduttanza->SetMarkerColor(kBlue);
   graphInduttanza->SetFillColor(0);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Sweep Condensatore; x(UDM); y(UDM)");
+  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Amplitude (V)");
   graphCondensatore->SetMarkerStyle(kOpenCircle);
   graphCondensatore->SetMarkerColor(kBlue);
   graphCondensatore->SetFillColor(0);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Sweep Totale; x(UDM); y(UDM)");
+  graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
   graphTotale->SetMarkerStyle(kOpenCircle);
   graphTotale->SetMarkerColor(kBlue);
   graphTotale->SetFillColor(0);
@@ -325,25 +325,25 @@ void amplitude_sweep()
 void phase_sweep()
 {
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; x(UDM); y(UDM)");
+  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
   graphResistenza->SetMarkerStyle(kOpenCircle);
   graphResistenza->SetMarkerColor(kBlue);
   graphResistenza->SetFillColor(0);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Sweep Induttanza; x(UDM); y(UDM)");
+  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
   graphInduttanza->SetMarkerStyle(kOpenCircle);
   graphInduttanza->SetMarkerColor(kBlue);
   graphInduttanza->SetFillColor(0);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Sweep Condensatore; x(UDM); y(UDM)");
+  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
   graphCondensatore->SetMarkerStyle(kOpenCircle);
   graphCondensatore->SetMarkerColor(kBlue);
   graphCondensatore->SetFillColor(0);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_fase/sweep_phase_totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Sweep Totale; x(UDM); y(UDM)");
+  graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Phase (RAD)");
   graphTotale->SetMarkerStyle(kOpenCircle);
   graphTotale->SetMarkerColor(kBlue);
   graphTotale->SetFillColor(0);
@@ -361,7 +361,55 @@ void phase_sweep()
 
   TCanvas *multiCanvas = new TCanvas();
   multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiCanvas->BuildLegend();; // Vedi cosa fa
+}
+
+void amplitude_time()
+{
+  TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
+  graphResistenza->SetMarkerStyle(kOpenCircle);
+  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetFillColor(0);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
+  graphInduttanza->SetMarkerStyle(kOpenCircle);
+  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetFillColor(0);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
+  graphCondensatore->SetMarkerStyle(kOpenCircle);
+  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetFillColor(0);
+
+  TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/totale.txt", "%lg %lg %lg");
+  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
+  graphTotale->SetMarkerStyle(kOpenCircle);
+  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetFillColor(0);
+
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(2, 2);
+  c1->cd(1);
+  graphResistenza->Draw("APE");
+  c1->cd(2);
+  graphInduttanza->Draw("APE");
+  c1->cd(3);
+  graphCondensatore->Draw("APE");
+  c1->cd(4);
+  graphTotale->Draw("APE");
+
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Ampiezze e Tempo - Risultati finali");
   multiGraph->Add(graphResistenza);
   multiGraph->Add(graphInduttanza);
   multiGraph->Add(graphCondensatore);
