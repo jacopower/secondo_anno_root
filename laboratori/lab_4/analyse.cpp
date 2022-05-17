@@ -12,10 +12,10 @@
 #include <iostream>
 #include "TMultiGraph.h"
 
-constexpr Double_t V0_mis = 5.; 
-constexpr Double_t R_mis = 149.83; 
-constexpr Double_t L_mis = 10.43 * 1E-3; 
-constexpr Double_t C_mis = 158.4 * 1E-9; 
+constexpr Double_t V0_mis = 5.;
+constexpr Double_t R_mis = 149.83;
+constexpr Double_t L_mis = 10.43 * 1E-3;
+constexpr Double_t C_mis = 158.4 * 1E-9;
 
 // R = 149.83 Ohm
 // C = 158.4 nF
@@ -310,13 +310,25 @@ void amplitude_sweep()
   TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 0, 2E4, 4);
 
   funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
+  funcResistenza->SetParNames("V0", "R", "L", "C");
+  funcResistenza->SetLineColor(kRed);
+  funcResistenza->SetLineStyle(2);
+
   funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
+  funcInduttanza->SetParNames("V0", "R", "L", "C");
+  funcInduttanza->SetLineColor(kRed);
+  funcInduttanza->SetLineStyle(2);
+
   funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis);
+  funcCondensatore->SetParNames("V0", "R", "L", "C");
+  funcCondensatore->SetLineColor(kRed);
+  funcCondensatore->SetLineStyle(2);
   // MANCA IL TOTALE, POI VEDIAMO COME SI FA
 
-  graphResistenza->Fit(funcResistenza); //OPZIONI
-  graphInduttanza->Fit(funcInduttanza); //OPZIONI
-  graphCondensatore->Fit(funcCondensatore); // OPZIONI
+  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
+  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
+  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
 
   TCanvas *c1 = new TCanvas();
@@ -337,9 +349,9 @@ void amplitude_sweep()
   multiGraph->Add(graphInduttanza);
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-  ; // Vedi cosa fa
+  // Vedi cosa fa
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
@@ -370,7 +382,30 @@ void phase_sweep()
   graphTotale->SetFillColor(0);
 
   // ***** CREO LE FUNZIONI DI FIT *****
+  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 0, 2E4, 3);     // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 0, 2E4, 3);     // LIMITI
+  TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 0, 2E4, 3); // LIMITI
 
+  funcResistenza->SetParameters(R_mis, L_mis, C_mis);
+  funcResistenza->SetParNames("R", "L", "C");
+  funcResistenza->SetLineColor(kRed);
+  funcResistenza->SetLineStyle(2);
+
+  funcInduttanza->SetParameters(R_mis, L_mis, C_mis);
+  funcInduttanza->SetParNames("R", "L", "C");
+  funcInduttanza->SetLineColor(kRed);
+  funcInduttanza->SetLineStyle(2);
+
+  funcCondensatore->SetParameters(R_mis, L_mis, C_mis);
+  funcCondensatore->SetParNames("R", "L", "C");
+  funcCondensatore->SetLineColor(kRed);
+  funcCondensatore->SetLineStyle(2);
+  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+
+  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
+  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
+  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
 
   TCanvas *c1 = new TCanvas();
@@ -391,9 +426,9 @@ void phase_sweep()
   multiGraph->Add(graphInduttanza);
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-  ; // Vedi cosa fa
+  // Vedi cosa fa
 }
 
 void amplitude_time()
@@ -422,6 +457,33 @@ void amplitude_time()
   graphTotale->SetMarkerColor(kBlue);
   graphTotale->SetFillColor(0);
 
+  // ***** CREO LE FUNZIONI DI FIT *****
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 2E4, 5);     // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 2E4, 5);     // LIMITI
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_time_condensatore, 0, 2E4, 5); // LIMITI
+
+  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis); // MANCA W
+  funcResistenza->SetParNames("V0", "R", "L", "C");           // MANCA W
+  funcResistenza->SetLineColor(kRed);
+  funcResistenza->SetLineStyle(2);
+
+  funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis); // MANCA W
+  funcInduttanza->SetParNames("V0", "R", "L", "C");           // MANCA W
+  funcInduttanza->SetLineColor(kRed);
+  funcInduttanza->SetLineStyle(2);
+
+  funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis); // MANCA W
+  funcCondensatore->SetParNames("V0", "R", "L", "C");           // MANCA W
+  funcCondensatore->SetLineColor(kRed);
+  funcCondensatore->SetLineStyle(2);
+  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+
+  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
+  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
+  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  // MANCA FIT CON POL0 DEL TOTALE
+  // ***** FINE PARTE FIT *****
+
   TCanvas *c1 = new TCanvas();
   c1->Divide(2, 2);
   c1->cd(1);
@@ -440,7 +502,7 @@ void amplitude_time()
   multiGraph->Add(graphInduttanza);
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA DA LP?
+  multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-  ; // Vedi cosa fa
+  // Vedi cosa fa
 }
