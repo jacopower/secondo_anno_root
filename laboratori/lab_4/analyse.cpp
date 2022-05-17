@@ -12,10 +12,10 @@
 #include <iostream>
 #include "TMultiGraph.h"
 
+constexpr Double_t V0_mis = 5.; 
 constexpr Double_t R_mis = 149.83; 
 constexpr Double_t L_mis = 10.43 * 1E-3; 
 constexpr Double_t C_mis = 158.4 * 1E-9; 
-constexpr Double_t V0_mis = 5.; 
 
 // R = 149.83 Ohm
 // C = 158.4 nF
@@ -308,7 +308,15 @@ void amplitude_sweep()
   TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 0, 2E4, 4);
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 0, 2E4, 4);
   TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 0, 2E4, 4);
+
+  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
+  funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
+  funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+
+  graphResistenza->Fit(funcResistenza); //OPZIONI
+  graphInduttanza->Fit(funcInduttanza); //OPZIONI
+  graphCondensatore->Fit(funcCondensatore); // OPZIONI
   // ***** FINE PARTE FIT *****
 
   TCanvas *c1 = new TCanvas();
