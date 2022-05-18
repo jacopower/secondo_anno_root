@@ -18,7 +18,6 @@ constexpr Double_t V0_mis = 5.;
 constexpr Double_t R_mis = 149.83;
 constexpr Double_t L_mis = 10.43 * 1E-3;
 constexpr Double_t C_mis = 158.4 * 1E-9;
-constexpr Double_t f_mis = 0.; // INSERISCIIII
 
 // R = 149.83 Ohm
 // C = 158.4 nF
@@ -434,27 +433,185 @@ void phase_sweep()
   // Vedi cosa fa
 }
 
-void amplitude_time()
+void amplitude_time_sotto_risonanza()
 {
-  TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/resistenza.txt", "%lg %lg %lg");
+  constexpr Double_t f_mis = 0.; // INSERISCIIII
+
+  TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
   graphResistenza->SetMarkerStyle(kOpenCircle);
   graphResistenza->SetMarkerColor(kBlue);
   graphResistenza->SetFillColor(0);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/induttanza.txt", "%lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
   graphInduttanza->SetMarkerStyle(kOpenCircle);
   graphInduttanza->SetMarkerColor(kBlue);
   graphInduttanza->SetFillColor(0);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/condensatore.txt", "%lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
   graphCondensatore->SetMarkerStyle(kOpenCircle);
   graphCondensatore->SetMarkerColor(kBlue);
   graphCondensatore->SetFillColor(0);
 
-  TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/totale.txt", "%lg %lg %lg");
+  TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/totale.txt", "%lg %lg %lg");
+  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
+  graphTotale->SetMarkerStyle(kOpenCircle);
+  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetFillColor(0);
+
+  // ***** CREO LE FUNZIONI DI FIT *****
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.03, 5);       // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.03, 5);       // LIMITI
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_time_condensatore, 0.03, 2E4, 5); // LIMITI
+
+  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcResistenza->SetParNames("V0", "R", "L", "C", "f");
+  funcResistenza->SetLineColor(kRed);
+  funcResistenza->SetLineStyle(2);
+
+  funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcInduttanza->SetParNames("V0", "R", "L", "C", "f");
+  funcInduttanza->SetLineColor(kRed);
+  funcInduttanza->SetLineStyle(2);
+
+  funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcCondensatore->SetParNames("V0", "R", "L", "C", "f");
+  funcCondensatore->SetLineColor(kRed);
+  funcCondensatore->SetLineStyle(2);
+  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+
+  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
+  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
+  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  // MANCA FIT CON POL0 DEL TOTALE
+  // ***** FINE PARTE FIT *****
+
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(2, 2);
+  c1->cd(1);
+  graphResistenza->Draw("APE");
+  c1->cd(2);
+  graphInduttanza->Draw("APE");
+  c1->cd(3);
+  graphCondensatore->Draw("APE");
+  c1->cd(4);
+  graphTotale->Draw("APE");
+
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Ampiezze e Tempo - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA FA LP?
+  multiCanvas->BuildLegend();
+  // Vedi cosa fa
+}
+
+void amplitude_time_in_risonanza()
+{
+  constexpr Double_t f_mis = 0.; // INSERISCIIII
+
+  TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
+  graphResistenza->SetMarkerStyle(kOpenCircle);
+  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetFillColor(0);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
+  graphInduttanza->SetMarkerStyle(kOpenCircle);
+  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetFillColor(0);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/in_risonanza/condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
+  graphCondensatore->SetMarkerStyle(kOpenCircle);
+  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetFillColor(0);
+
+  TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/in_risonanza/totale.txt", "%lg %lg %lg");
+  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
+  graphTotale->SetMarkerStyle(kOpenCircle);
+  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetFillColor(0);
+
+  // ***** CREO LE FUNZIONI DI FIT *****
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.03, 5);       // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.03, 5);       // LIMITI
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_time_condensatore, 0.03, 2E4, 5); // LIMITI
+
+  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcResistenza->SetParNames("V0", "R", "L", "C", "f");
+  funcResistenza->SetLineColor(kRed);
+  funcResistenza->SetLineStyle(2);
+
+  funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcInduttanza->SetParNames("V0", "R", "L", "C", "f");
+  funcInduttanza->SetLineColor(kRed);
+  funcInduttanza->SetLineStyle(2);
+
+  funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis, f_mis);
+  funcCondensatore->SetParNames("V0", "R", "L", "C", "f");
+  funcCondensatore->SetLineColor(kRed);
+  funcCondensatore->SetLineStyle(2);
+  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
+
+  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
+  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
+  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  // MANCA FIT CON POL0 DEL TOTALE
+  // ***** FINE PARTE FIT *****
+
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(2, 2);
+  c1->cd(1);
+  graphResistenza->Draw("APE");
+  c1->cd(2);
+  graphInduttanza->Draw("APE");
+  c1->cd(3);
+  graphCondensatore->Draw("APE");
+  c1->cd(4);
+  graphTotale->Draw("APE");
+
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Ampiezze e Tempo - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA FA LP?
+  multiCanvas->BuildLegend();
+  // Vedi cosa fa
+}
+
+void amplitude_time_sopra_risonanza()
+{
+  constexpr Double_t f_mis = 0.; // INSERISCIIII
+
+  TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
+  graphResistenza->SetMarkerStyle(kOpenCircle);
+  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetFillColor(0);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
+  graphInduttanza->SetMarkerStyle(kOpenCircle);
+  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetFillColor(0);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
+  graphCondensatore->SetMarkerStyle(kOpenCircle);
+  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetFillColor(0);
+
+  TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
   graphTotale->SetMarkerStyle(kOpenCircle);
   graphTotale->SetMarkerColor(kBlue);
