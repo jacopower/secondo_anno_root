@@ -15,9 +15,9 @@
 // FORMULA f = W / (2*pi)
 
 constexpr Double_t V0_mis = 5.;
-constexpr Double_t R_mis = 149.83;
-constexpr Double_t L_mis = 10.43 * 1E-3;
-constexpr Double_t C_mis = 158.4 * 1E-9;
+constexpr Double_t R_mis = 150.47;
+constexpr Double_t L_mis = 11.46 * 1E-3;
+constexpr Double_t C_mis = 157.8 * 1E-9;
 
 // R = 149.83 Ohm
 // C = 158.4 nF
