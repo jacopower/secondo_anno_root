@@ -147,7 +147,13 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   TH1F *histo1k = new TH1F("histo1k", "Rumore a 1kHz", N, 4.9, 5.1);
   TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
   TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
-  TH1F *histoFase = new TH1F("histoFase", "Rumore Fase", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histo15k = new TH1F("histo15k", "Rumore a 15kHz", N, 4.9, 5.1);
+  TH1F *histo20k = new TH1F("histo15k", "Rumore a 15kHz", N, 4.9, 5.1);
+  TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 4.9, 5.1);    // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 4.9, 5.1);    // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
 
   std::ifstream in; // VA BENE SE APRO E CHIUDO QUESTO?
 
@@ -193,6 +199,34 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   }
   in.close();
 
+  // LEGGO RUMORE A 15K
+  in.open("data/rumore/ampiezza15k.txt");
+  Float_t ampiezza15k;
+  while (1)
+  {
+    in >> ampiezza15k;
+    if (!in.good())
+    {
+      break;
+    }
+    histo15k->Fill(ampiezza15k);
+  }
+  in.close();
+
+  // LEGGO RUMORE A 20K
+  in.open("data/rumore/ampiezza20k.txt");
+  Float_t ampiezza20k;
+  while (1)
+  {
+    in >> ampiezza20k;
+    if (!in.good())
+    {
+      break;
+    }
+    histo20k->Fill(ampiezza20k);
+  }
+  in.close();
+
   // LEGGO RUMORE ONDA QUADRA
   in.open("data/rumore/rumore_onda_quadra.txt");
   Float_t ampiezzaOndaQuadra;
@@ -207,17 +241,73 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   }
   in.close();
 
-  // LEGGO RUMORE FASE
-  in.open("data/rumore/rumore_fase.txt");
-  Float_t ampiezzaFase;
+  // LEGGO RUMORE FASE 1k
+  in.open("data/rumore/fase1k.txt");
+  Float_t ampiezzaFase1k;
   while (1)
   {
-    in >> ampiezzaFase;
+    in >> ampiezzaFase1k;
     if (!in.good())
     {
       break;
     }
-    histoFase->Fill(ampiezzaFase);
+    histoFase1k->Fill(ampiezzaFase1k);
+  }
+  in.close();
+
+  // LEGGO RUMORE FASE 4k
+  in.open("data/rumore/fase4k.txt");
+  Float_t ampiezzaFase4k;
+  while (1)
+  {
+    in >> ampiezzaFase4k;
+    if (!in.good())
+    {
+      break;
+    }
+    histoFase4k->Fill(ampiezzaFase4k);
+  }
+  in.close();
+
+  // LEGGO RUMORE FASE 10k
+  in.open("data/rumore/fase10k.txt");
+  Float_t ampiezzaFase10k;
+  while (1)
+  {
+    in >> ampiezzaFase10k;
+    if (!in.good())
+    {
+      break;
+    }
+    histoFase10k->Fill(ampiezzaFase10k);
+  }
+  in.close();
+
+  // LEGGO RUMORE FASE 15k
+  in.open("data/rumore/fase15k.txt");
+  Float_t ampiezzaFase15k;
+  while (1)
+  {
+    in >> ampiezzaFase15k;
+    if (!in.good())
+    {
+      break;
+    }
+    histoFase15k->Fill(ampiezzaFase15k);
+  }
+  in.close();
+
+  // LEGGO RUMORE FASE 20k
+  in.open("data/rumore/fase20k.txt");
+  Float_t ampiezzaFase20k;
+  while (1)
+  {
+    in >> ampiezzaFase20k;
+    if (!in.good())
+    {
+      break;
+    }
+    histoFase20k->Fill(ampiezzaFase20k);
   }
   in.close();
 
@@ -246,6 +336,22 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
             << "Overflows: " << histo10k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
+  Double_t ampiezza15kDev = histo15k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 15kHz *****" << '\n'
+            << "Deviazione Standard: " << ampiezza15kDev << '\n'
+            << "Underflows: " << histo15k->GetBinContent(0) << '\n'
+            << "Overflows: " << histo15k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
+  Double_t ampiezza20kDev = histo20k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE 20kHz *****" << '\n'
+            << "Deviazione Standard: " << ampiezza20kDev << '\n'
+            << "Underflows: " << histo20k->GetBinContent(0) << '\n'
+            << "Overflows: " << histo20k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
   Double_t ampiezzaOndaQuadraDev = histoOndaQuadra->GetStdDev();
   std::cout << '\n'
             << " ***** DEVIAZIONE STANDARD RUMORE ONDA QUADRA (CIRCUITO VUOTO) *****" << '\n'
@@ -254,12 +360,44 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
             << "Overflows: " << histoOndaQuadra->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
-  Double_t ampiezzaFaseDev = histoFase->GetStdDev();
+  Double_t ampiezzaFaseDev1k = histoFase1k->GetStdDev();
   std::cout << '\n'
-            << " ***** DEVIAZIONE STANDARD RUMORE FASE *****" << '\n'
-            << "Deviazione Standard: " << ampiezzaFaseDev << '\n'
-            << "Underflows: " << histoFase->GetBinContent(0) << '\n'
-            << "Overflows: " << histoFase->GetBinContent(N + 1) << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE A 1K *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev1k << '\n'
+            << "Underflows: " << histoFase1k->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase1k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
+  Double_t ampiezzaFaseDev4k = histoFase4k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE A 4K *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev4k << '\n'
+            << "Underflows: " << histoFase4k->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase4k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
+  Double_t ampiezzaFaseDev10k = histoFase10k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE A 10K *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev10k << '\n'
+            << "Underflows: " << histoFase10k->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase10k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
+  Double_t ampiezzaFaseDev15k = histoFase15k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE A 15K *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev15k << '\n'
+            << "Underflows: " << histoFase15k->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase15k->GetBinContent(N + 1) << '\n'
+            << "**********" << '\n';
+
+  Double_t ampiezzaFaseDev20k = histoFase20k->GetStdDev();
+  std::cout << '\n'
+            << " ***** DEVIAZIONE STANDARD RUMORE FASE A 20K *****" << '\n'
+            << "Deviazione Standard: " << ampiezzaFaseDev20k << '\n'
+            << "Underflows: " << histoFase20k->GetBinContent(0) << '\n'
+            << "Overflows: " << histoFase20k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
   // PLOT ISTOGRAMMI
@@ -274,9 +412,28 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   c->cd(4);
   histoOndaQuadra->Draw();
 
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(1, 1);
+  c1->cd(1);
+  histo15k->Draw();
+  c1->cd(2);
+  histo20k->Draw();
+
   TCanvas *c2 = new TCanvas;
-  c2->cd();
-  histoFase->Draw();
+  c2->Divide(2, 2);
+  c2->cd(1);
+  histoFase1k->Draw();
+  c2->cd(2);
+  histoFase4k->Draw();
+  c2->cd(3);
+  histoFase10k->Draw();
+  c2->cd(4);
+  histoFase15k->Draw();
+
+  TCanvas *c3 = new TCanvas;
+  c3->Divide(1, 1);
+  c3->cd(1);
+  histo20k->Draw();
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
