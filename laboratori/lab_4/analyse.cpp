@@ -670,7 +670,7 @@ void amplitude_time_sotto_risonanza()
 
 void amplitude_time_in_risonanza()
 {
-  constexpr Double_t f_mis = 0.; // INSERISCIIII
+  constexpr Double_t f_mis = 3530; // INSERISCIIII
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
