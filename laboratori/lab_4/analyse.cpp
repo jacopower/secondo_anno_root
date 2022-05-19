@@ -148,12 +148,12 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
   TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
   TH1F *histo15k = new TH1F("histo15k", "Rumore a 15kHz", N, 4.9, 5.1);
-  TH1F *histo20k = new TH1F("histo15k", "Rumore a 15kHz", N, 4.9, 5.1);
-  TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 4.9, 5.1);    // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 4.9, 5.1);    // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 4.9, 5.1); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histo20k = new TH1F("histo20k", "Rumore a 20kHz", N, 4.9, 5.1);
+  TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 0.20, 0.21);    // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 0.25, 0.26);    // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 0.21, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 0.21, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 0.21, 0.23); // ATTENZIONE A NUMERO BIN E ESTREMI
 
   std::ifstream in; // VA BENE SE APRO E CHIUDO QUESTO?
 
