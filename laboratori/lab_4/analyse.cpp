@@ -410,6 +410,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   graphAmpiezza->GetYaxis()->SetTitle("Incertezza su Ampiezza");
   graphAmpiezza->SetMarkerStyle(kFullCircle);
   graphAmpiezza->SetMarkerColor(kBlue);
+
   TF1 *f1 = new TF1("f1", "[0] + [1] * x", 1E3, 20E3);
   f1->SetParNames("q", "m");
   f1->SetLineColor(kRed);
@@ -425,6 +426,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   graphFase->GetYaxis()->SetTitle("Incertezza su Fase");
   graphFase->SetMarkerStyle(kFullCircle);
   graphFase->SetMarkerColor(kBlue);
+
   TF1 *f2 = new TF1("f2", "[0] + [1] * x", 1E3, 20E3);
   f2->SetParNames("q", "m");
   f2->SetLineColor(kRed);
