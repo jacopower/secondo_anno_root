@@ -400,40 +400,70 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
             << "Overflows: " << histoFase20k->GetBinContent(N + 1) << '\n'
             << "**********" << '\n';
 
+  // FACCIO FIT LINEARE SUGLI ERRORI DELL'AMPIEZZA
+  const Int_t nPoints = 5;
+  Double_t yAmpiezza[nPoints] = {ampiezza1kDev, ampiezza4kDev, ampiezza10kDev, ampiezza15kDev, ampiezza20kDev};
+  Double_t xAmpiezza[nPoints] = {1E3, 4E3, 10E3, 15E3, 20E3};
+  TGraph *graphAmpiezza = new TGraph(nPoints, xAmpiezza, yAmpiezza);
+  graphAmpiezza->SetTitle("Incertezze sulla misura dell'Ampiezza con Extract Single Tone");
+  graphAmpiezza->GetXaxis()->SetTitle("Frequenza Generatore");
+  graphAmpiezza->GetYaxis()->SetTitle("Incertezza su Ampiezza");
+  graphAmpiezza->SetMarkerStyle(kFullCircle);
+  graphAmpiezza->SetMarkerColor(kBlue);
+  TF1 *f1 = new TF1("f1", "[0] + [1] * x", 1E3, 20E3, 2);
+  graphAmpiezza->Fit(f1, "R");
+
+  // FACCIO FIT LINEARE SUGLI ERRORI DELLA FASE
+  Double_t yFase[nPoints] = {ampiezzaFaseDev1k, ampiezzaFaseDev4k, ampiezzaFaseDev10k, ampiezzaFaseDev15k, ampiezzaFaseDev20k};
+  Double_t xFase[nPoints] = {1E3, 4E3, 10E3, 15E3, 20E3};
+  TGraph *graphFase = new TGraph(nPoints, xFase, yFase);
+  graphFase->SetTitle("Incertezze sulla misura della Fase con Extract Single Tone");
+  graphFase->GetXaxis()->SetTitle("Frequenza Generatore");
+  graphFase->GetYaxis()->SetTitle("Incertezza su Fase");
+  graphFase->SetMarkerStyle(kFullCircle);
+  graphFase->SetMarkerColor(kBlue);
+
   // PLOT ISTOGRAMMI
-  TCanvas *c = new TCanvas;
-  c->Divide(2, 2);
-  c->cd(1);
-  histo1k->Draw();
-  c->cd(2);
-  histo4k->Draw();
-  c->cd(3);
-  histo10k->Draw();
-  c->cd(4);
+  TCanvas *cOndaQuadra = new TCanvas;
+  cOndaQuadra->cd();
   histoOndaQuadra->Draw();
 
-  TCanvas *c1 = new TCanvas();
-  c1->Divide(1, 1);
-  c1->cd(1);
+  TCanvas *cAmpiezza = new TCanvas;
+  cAmpiezza->Divide(3, 3);
+  cAmpiezza->cd(1);
+  histo1k->Draw();
+  cAmpiezza->cd(2);
+  histo4k->Draw();
+  cAmpiezza->cd(3);
+  histo10k->Draw();
+  cAmpiezza->cd(4);
   histo15k->Draw();
-  c1->cd(2);
+  cAmpiezza->cd(5);
   histo20k->Draw();
 
-  TCanvas *c2 = new TCanvas;
-  c2->Divide(2, 2);
-  c2->cd(1);
+  TCanvas *cFase = new TCanvas;
+  cFase->Divide(3,3);
+  cFase->cd(1);
   histoFase1k->Draw();
-  c2->cd(2);
+  cFase->cd(2);
   histoFase4k->Draw();
-  c2->cd(3);
+  cFase->cd(3);
   histoFase10k->Draw();
-  c2->cd(4);
+  cFase->cd(4);
   histoFase15k->Draw();
-
-  TCanvas *c3 = new TCanvas;
-  c3->Divide(1, 1);
-  c3->cd(1);
+  cFase->cd(5);
   histo20k->Draw();
+
+  TCanvas *cErroreAmpiezza = new TCanvas;
+  cErroreAmpiezza->cd();
+  graphAmpiezza->Draw("APE");
+  //STAMPO
+
+  TCanvas *cErroreFase = new TCanvas;
+  cErroreFase->cd();
+  graphFase->Draw("APE");
+  //STAMPO
+  
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
