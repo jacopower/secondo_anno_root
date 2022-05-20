@@ -530,6 +530,10 @@ void amplitude_sweep()
   // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
 
+  //STAMPO RESISTENZA
+  TCanvas *cResistenza = new TCanvas();
+  graphResistenza->Draw("APE");
+
   TCanvas *c1 = new TCanvas();
   c1->Divide(2, 2);
   c1->cd(1);
