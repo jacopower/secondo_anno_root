@@ -151,7 +151,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   TH1F *histo20k = new TH1F("histo20k", "Rumore a 20kHz", N, 4.9, 5.1);
   TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 0.20, 0.21);    // ATTENZIONE A NUMERO BIN E ESTREMI
   TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 0.25, 0.26);    // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 0.21, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 0.20, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
   TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 0.21, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
   TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 0.21, 0.23); // ATTENZIONE A NUMERO BIN E ESTREMI
 
@@ -439,7 +439,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   histoOndaQuadra->Draw();
 
   TCanvas *cAmpiezza = new TCanvas;
-  cAmpiezza->Divide(3, 3);
+  cAmpiezza->Divide(2, 3);
   cAmpiezza->cd(1);
   histo1k->Draw();
   cAmpiezza->cd(2);
@@ -452,7 +452,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   histo20k->Draw();
 
   TCanvas *cFase = new TCanvas;
-  cFase->Divide(3,3);
+  cFase->Divide(2,3);
   cFase->cd(1);
   histoFase1k->Draw();
   cFase->cd(2);
