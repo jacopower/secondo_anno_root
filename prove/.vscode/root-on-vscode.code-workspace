@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "../"
+		}
+  ],
+  "settings": {
+    "files.associations": {
+      "hsimple.C": "cpp",
+      "myMacro.C": "cpp",
+      "testHisto.C": "cpp",
+      "v1_myMacro.C": "cpp",
+      "v2_myMacro.C": "cpp",
+      "v3_myMacro.C": "cpp",
+      "???????v3_myMacro.C": "cpp",
+      "v4_myMacro.C": "cpp",
+      "v5_myMacro.C": "cpp",
+      "???v5_myMacro.C": "cpp",
+      "prova.C": "cpp"
+    },
+    "C_Cpp.default.includePath": [
+      "${default}",
+      "/home/root/include"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "albertopdrf.root-file-viewer",
+      "ms-vscode.cpptools"
+    ]
+  }
+}

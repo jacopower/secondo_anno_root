@@ -1,0 +1,36 @@
+{
+	"folders": [
+		{
+			"path": "../"
+		}
+  ],
+  "settings": {
+    "files.associations": {
+      "hsimple.C": "cpp",
+      "benchmark.C": "cpp",
+      "resolution.C": "cpp",
+      "efficiency.C": "cpp",
+      "myMacro.C": "cpp",
+      "myMacroSol_V10.C": "cpp",
+      "myMacroSol_V11.C": "cpp",
+      "myMacroSol_V12.C": "cpp",
+      "myMacroSol_V13.C": "cpp",
+      "myMacroSol_V14.C": "cpp",
+      "testHisto.C": "cpp",
+      "testList.C": "cpp",
+      "proportions.C": "cpp",
+      "testCorrelation.C": "cpp",
+      "myMacroSol_V15.C": "cpp"
+    },
+    "C_Cpp.default.includePath": [
+      "${default}",
+      "/home/root/include"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "albertopdrf.root-file-viewer",
+      "ms-vscode.cpptools"
+    ]
+  }
+}

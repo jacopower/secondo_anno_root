@@ -1,0 +1,4 @@
+/home/goancia/secondo_anno/laboratori/lab_1/build/CMakeFiles/rebuild_cache.dir
+/home/goancia/secondo_anno/laboratori/lab_1/build/CMakeFiles/edit_cache.dir
+/home/goancia/secondo_anno/laboratori/lab_1/build/CMakeFiles/test.dir
+/home/goancia/secondo_anno/laboratori/lab_1/build/CMakeFiles/particle.dir

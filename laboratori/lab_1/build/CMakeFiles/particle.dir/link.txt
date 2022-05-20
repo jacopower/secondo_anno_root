@@ -1,0 +1,1 @@
+/usr/bin/c++  -g  -fsanitize=address CMakeFiles/particle.dir/ParticleType.cpp.o CMakeFiles/particle.dir/ResonanceType.cpp.o CMakeFiles/particle.dir/Particle.cpp.o CMakeFiles/particle.dir/test2.cpp.o  -o particle 
