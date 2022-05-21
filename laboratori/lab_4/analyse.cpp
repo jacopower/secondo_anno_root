@@ -14,8 +14,9 @@
 
 // FORMULA f = W / (2*pi)
 
-constexpr Double_t V0_mis = 5.;
-constexpr Double_t R_mis = 150.47;
+// VEDI QUESTI PARAMETRI
+constexpr Double_t V0_mis = 3.21514;
+constexpr Double_t R_mis = 150.47 + 50;
 constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
 
@@ -71,7 +72,8 @@ Double_t amp_time_condensatore(Double_t *x, Double_t *par)
   return val;
 }
 
-Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+/*
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
 {
   // 4 PARAMETRI
   // par[0] = V0
@@ -80,6 +82,19 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON 
   // par[3] = C
   Double_t xx = x[0];
   Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  return val;
+}
+*/
+
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = par[1] * par[0] / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
   return val;
 }
 
@@ -452,7 +467,7 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   histo20k->Draw();
 
   TCanvas *cFase = new TCanvas;
-  cFase->Divide(2,3);
+  cFase->Divide(2, 3);
   cFase->cd(1);
   histoFase1k->Draw();
   cFase->cd(2);
@@ -467,13 +482,12 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
   TCanvas *cErroreAmpiezza = new TCanvas;
   cErroreAmpiezza->cd();
   graphAmpiezza->Draw("APE");
-  //STAMPO
+  // STAMPO
 
   TCanvas *cErroreFase = new TCanvas;
   cErroreFase->cd();
   graphFase->Draw("APE");
-  //STAMPO
-  
+  // STAMPO
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
@@ -504,9 +518,10 @@ void amplitude_sweep()
   graphTotale->SetFillColor(0);
 
   // ***** CREO LE FUNZIONI DI FIT *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 0, 2E4, 4);
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 0, 2E4, 4);
-  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 0, 2E4, 4);
+  //TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 301, 19950, 4);
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 301, 19950, 4);
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 301, 19950, 4);
 
   funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   funcResistenza->SetParNames("V0", "R", "L", "C");
@@ -530,7 +545,7 @@ void amplitude_sweep()
   // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
 
-  //STAMPO RESISTENZA
+  // STAMPO RESISTENZA
   TCanvas *cResistenza = new TCanvas();
   graphResistenza->Draw("APE");
 
