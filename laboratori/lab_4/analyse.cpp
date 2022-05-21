@@ -16,9 +16,10 @@
 
 // VEDI QUESTI PARAMETRI
 constexpr Double_t V0_mis = 3.21514;
-constexpr Double_t R_mis = 150.47 + 50;
+constexpr Double_t R_mis = 150.47;
 constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
+constexpr Double_t R_tot = 200;
 
 // R = 149.83 Ohm
 // C = 158.4 nF
@@ -30,7 +31,7 @@ void setStyle()
   gStyle->SetPalette(57);
   gStyle->SetOptTitle(1);
   gStyle->SetOptStat(112210);
-  gStyle->SetOptFit(1111);
+  gStyle->SetOptFit(111111);
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -93,8 +94,9 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
   // par[1] = R
   // par[2] = L
   // par[3] = C
+  // par[4] = Rtot
   Double_t xx = x[0];
-  Double_t val = par[1] * par[0] / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
+  Double_t val = par[1] * par[0] / (TMath::Sqrt(par[4] * par[4] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
   return val;
 }
 
@@ -493,10 +495,10 @@ void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
 // CHE ERRORE SU Y ASSOCIARE QUI?
 void amplitude_sweep()
 {
-  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
-  graphResistenza->SetMarkerStyle(kOpenCircle);
-  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetMarkerStyle(kPlus);
+  graphResistenza->SetMarkerColor(kAzure);
   graphResistenza->SetFillColor(0);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
@@ -513,20 +515,25 @@ void amplitude_sweep()
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
-  graphTotale->SetMarkerStyle(kOpenCircle);
-  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetMarkerStyle(kPlum);
+  graphTotale->SetMarkerColor(kAzure);
   graphTotale->SetFillColor(0);
 
   // ***** CREO LE FUNZIONI DI FIT *****
-  //TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 301, 19950, 4);
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 5);
+  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis, R_tot);
+  //funcResistenza->SetParLimits(0, 3.20, 3.22);
+  funcResistenza->SetParLimits(1, 145, 155);
+  funcResistenza->SetParLimits(3, 155E-9, 159E-9);
+  funcResistenza->SetParNames("V0", "R", "L", "C", "Rtot");
+  funcResistenza->SetLineWidth(2);
+  funcResistenza->SetLineColor(kRed);
+  graphResistenza->Fit(funcResistenza, "R");
+
+
+
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 301, 19950, 4);
   TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 301, 19950, 4);
-
-  funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
-  funcResistenza->SetParNames("V0", "R", "L", "C");
-  funcResistenza->SetLineColor(kRed);
-  funcResistenza->SetLineStyle(2);
 
   funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   funcInduttanza->SetParNames("V0", "R", "L", "C");
@@ -539,11 +546,12 @@ void amplitude_sweep()
   funcCondensatore->SetLineStyle(2);
   // MANCA IL TOTALE, POI VEDIAMO COME SI FA
 
-  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
-  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
-  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  
+  graphInduttanza->Fit(funcInduttanza, "R");
+  graphCondensatore->Fit(funcCondensatore, "R");
   // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
+  
 
   // STAMPO RESISTENZA
   TCanvas *cResistenza = new TCanvas();
