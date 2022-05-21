@@ -593,18 +593,18 @@ void amplitude_sweep()
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
 
-/*
-  TCanvas *c1 = new TCanvas();
-  c1->Divide(2, 2);
-  c1->cd(1);
-  graphResistenza->Draw("APE");
-  c1->cd(2);
-  graphInduttanza->Draw("APE");
-  c1->cd(3);
-  graphCondensatore->Draw("APE");
-  c1->cd(4);
-  graphTotale->Draw("APE");
-*/
+  /*
+    TCanvas *c1 = new TCanvas();
+    c1->Divide(2, 2);
+    c1->cd(1);
+    graphResistenza->Draw("APE");
+    c1->cd(2);
+    graphInduttanza->Draw("APE");
+    c1->cd(3);
+    graphCondensatore->Draw("APE");
+    c1->cd(4);
+    graphTotale->Draw("APE");
+  */
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?

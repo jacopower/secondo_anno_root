@@ -106,7 +106,7 @@ void analyse()
   leg->AddEntry(residueGraph, "Residuo");
 
   TCanvas *c = new TCanvas("c", "canvas", 800, 800);
-
+/*
   // ***** PAD 1 - UPPER PLOT *****
   TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
   pad1->SetBottomMargin(0); // Upper and lower plot are joined
@@ -125,6 +125,7 @@ void analyse()
   pad2->Draw();
   pad2->cd(); // pad2 becomes the current pad
   residueGraph->Draw();
+  */
 
   // ***** ALTRO PLOT DEL RESIDUO *****
   TCanvas *c2 = new TCanvas("c2", "canvas", 800, 800);
