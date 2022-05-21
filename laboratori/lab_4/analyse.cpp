@@ -607,7 +607,6 @@ void amplitude_sweep()
   */
 }
 
-// CHE ERRORE SU Y ASSOCIARE QUI?
 void phase_sweep()
 {
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
@@ -736,7 +735,7 @@ void amplitude_time_sotto_risonanza()
   graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
   graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
   graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
-  // MANCA FIT CON POL0 DEL TOTALE
+
   // ***** FINE PARTE FIT *****
 
   TCanvas *c1 = new TCanvas();
@@ -759,7 +758,6 @@ void amplitude_time_sotto_risonanza()
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-  // Vedi cosa fa
 }
 
 void amplitude_time_in_risonanza()
