@@ -12,7 +12,48 @@
 #include <iostream>
 #include "TMultiGraph.h"
 
+/*
 // FORMULA f = W / (2*pi)
+// R = 149.83 Ohm
+// C = 158.4 nF
+// L = 10.43 mH
+
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  return val;
+}
+
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = xx * TMath::Pi() * 2 * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  return val;
+}
+
+Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = par[0] / xx * TMath::Pi() * 2 / par[3] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  return val;
+}
+*/
 
 // VEDI QUESTI PARAMETRI
 constexpr Double_t V0_mis = 3.21514;
@@ -20,10 +61,6 @@ constexpr Double_t R_mis = 150.47;
 constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t R_tot = 200;
-
-// R = 149.83 Ohm
-// C = 158.4 nF
-// L = 10.43 mH
 
 void setStyle()
 {
@@ -73,20 +110,6 @@ Double_t amp_time_condensatore(Double_t *x, Double_t *par)
   return val;
 }
 
-/*
-Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
-{
-  // 4 PARAMETRI
-  // par[0] = V0
-  // par[1] = R
-  // par[2] = L
-  // par[3] = C
-  Double_t xx = x[0];
-  Double_t val = par[1] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
-  return val;
-}
-*/
-
 Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
 {
   // 4 PARAMETRI
@@ -99,20 +122,6 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
   Double_t val = par[1] * par[0] / (TMath::Sqrt(par[4] * par[4] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
   return val;
 }
-
-/*
-Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
-{
-  // 4 PARAMETRI
-  // par[0] = V0
-  // par[1] = R
-  // par[2] = L
-  // par[3] = C
-  Double_t xx = x[0];
-  Double_t val = xx * TMath::Pi() * 2 * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
-  return val;
-}
-*/
 
 Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
 {
@@ -134,7 +143,7 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA NO
   // par[2] = L
   // par[3] = C
   Double_t xx = x[0];
-  Double_t val = par[0] / xx * TMath::Pi() * 2 / par[3] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  Double_t val = par[0] / (TMath::TwoPi() * xx * par[3]) / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
   return val;
 }
 
@@ -171,22 +180,22 @@ Double_t phase_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA 
   return val;
 }
 
-void rumore() // CALCOLO DEVIAZIONE STANDARD DAL RUMORE
+void rumore()
 {
-  constexpr int N = 1000; // VEDI QUESTO
+  constexpr int N = 1000;
   TH1F *histoOndaQuadra = new TH1F("histoOndaQuadra", "Rumore con Onda Quadra", N, 4.9, 5.1);
   TH1F *histo1k = new TH1F("histo1k", "Rumore a 1kHz", N, 4.9, 5.1);
   TH1F *histo4k = new TH1F("histo4k", "Rumore a 4kHz", N, 4.9, 5.1);
   TH1F *histo10k = new TH1F("histo10k", "Rumore a 10kHz", N, 4.9, 5.1);
   TH1F *histo15k = new TH1F("histo15k", "Rumore a 15kHz", N, 4.9, 5.1);
   TH1F *histo20k = new TH1F("histo20k", "Rumore a 20kHz", N, 4.9, 5.1);
-  TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 0.20, 0.21);    // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 0.25, 0.26);    // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 0.20, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 0.21, 0.22); // ATTENZIONE A NUMERO BIN E ESTREMI
-  TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 0.21, 0.23); // ATTENZIONE A NUMERO BIN E ESTREMI
+  TH1F *histoFase1k = new TH1F("histoFase1k", "Rumore Fase a 1k", N, 0.20, 0.21);
+  TH1F *histoFase4k = new TH1F("histoFase4k", "Rumore Fase a 4k", N, 0.25, 0.26);
+  TH1F *histoFase10k = new TH1F("histoFase10k", "Rumore Fase a 10k", N, 0.20, 0.22);
+  TH1F *histoFase15k = new TH1F("histoFase15k", "Rumore Fase a 15k", N, 0.21, 0.22);
+  TH1F *histoFase20k = new TH1F("histoFase20k", "Rumore Fase a 20k", N, 0.21, 0.23);
 
-  std::ifstream in; // VA BENE SE APRO E CHIUDO QUESTO?
+  std::ifstream in;
 
   // LEGGO RUMORE A 1K
   in.open("data/rumore/ampiezza1k.txt");
@@ -521,10 +530,10 @@ void amplitude_sweep()
   graphInduttanza->SetMarkerColor(kAzure);
   graphInduttanza->SetFillColor(0);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Amplitude (V)");
-  graphCondensatore->SetMarkerStyle(kOpenCircle);
-  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetMarkerStyle(kPlus);
+  graphCondensatore->SetMarkerColor(kAzure);
   graphCondensatore->SetFillColor(0);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
@@ -554,12 +563,12 @@ void amplitude_sweep()
   graphInduttanza->Fit(funcInduttanza, "R");
 
   // ***** FIT SU CONDENSATORE *****
-
-  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 301, 19950, 4);
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 1.5E3, 5E3, 4);
   funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   funcCondensatore->SetParNames("V0", "R", "L", "C");
+  funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
+  funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
-  funcCondensatore->SetLineStyle(2);
   graphCondensatore->Fit(funcCondensatore, "R");
 
   // ***** FIT SU GENERATORE *****
@@ -568,33 +577,35 @@ void amplitude_sweep()
   // ***** FINE PARTE FIT *****
 
   // PLOTTO GRAFICI
-  //TCanvas *cResistenza = new TCanvas();
-  //graphResistenza->Draw("APE");
-  TCanvas *cInduttanza = new TCanvas();
-  graphInduttanza->Draw("ALP");
+  // TCanvas *cResistenza = new TCanvas();
+  // graphResistenza->Draw("APE"); // ALP
+  // TCanvas *cInduttanza = new TCanvas();
+  // graphInduttanza->Draw("APE"); // ALP
+  TCanvas *cCondensatore = new TCanvas();
+  graphCondensatore->Draw("APE"); // ALP
 
-/*
-  TCanvas *c1 = new TCanvas();
-  c1->Divide(2, 2);
-  c1->cd(1);
-  graphResistenza->Draw("APE");
-  c1->cd(2);
-  graphInduttanza->Draw("APE");
-  c1->cd(3);
-  graphCondensatore->Draw("APE");
-  c1->cd(4);
-  graphTotale->Draw("APE");
+  /*
+    TCanvas *c1 = new TCanvas();
+    c1->Divide(2, 2);
+    c1->cd(1);
+    graphResistenza->Draw("APE");
+    c1->cd(2);
+    graphInduttanza->Draw("APE");
+    c1->cd(3);
+    graphCondensatore->Draw("APE");
+    c1->cd(4);
+    graphTotale->Draw("APE");
 
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  multiGraph->Add(graphResistenza);
-  multiGraph->Add(graphInduttanza);
-  multiGraph->Add(graphCondensatore);
-  multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA FA LP?
-  multiCanvas->BuildLegend();
-  */
+    TCanvas *multiCanvas = new TCanvas();
+    multiCanvas->cd();
+    TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+    multiGraph->Add(graphResistenza);
+    multiGraph->Add(graphInduttanza);
+    multiGraph->Add(graphCondensatore);
+    multiGraph->Add(graphTotale);
+    multiGraph->Draw("ALP"); // COSA FA LP?
+    multiCanvas->BuildLegend();
+    */
   // Vedi cosa fa
 }
 
