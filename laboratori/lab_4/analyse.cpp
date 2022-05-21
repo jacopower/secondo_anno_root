@@ -100,6 +100,7 @@ Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
   return val;
 }
 
+/*
 Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
 {
   // 4 PARAMETRI
@@ -109,6 +110,19 @@ Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON 
   // par[3] = C
   Double_t xx = x[0];
   Double_t val = xx * TMath::Pi() * 2 * par[2] * par[0] / TMath::Sqrt(par[1] * par[1] + (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])) * (xx * TMath::Pi() * 2 * par[2] - 1 / (xx * TMath::Pi() * 2 * par[3])));
+  return val;
+}
+*/
+
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+{
+  // 4 PARAMETRI
+  // par[0] = V0
+  // par[1] = R
+  // par[2] = L
+  // par[3] = C
+  Double_t xx = x[0];
+  Double_t val = TMath::TwoPi() * xx * par[2] * par[0] / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
   return val;
 }
 
@@ -501,10 +515,10 @@ void amplitude_sweep()
   graphResistenza->SetMarkerColor(kAzure);
   graphResistenza->SetFillColor(0);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Amplitude (V)");
-  graphInduttanza->SetMarkerStyle(kOpenCircle);
-  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetMarkerStyle(kPlus);
+  graphInduttanza->SetMarkerColor(kAzure);
   graphInduttanza->SetFillColor(0);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
@@ -519,10 +533,10 @@ void amplitude_sweep()
   graphTotale->SetMarkerColor(kAzure);
   graphTotale->SetFillColor(0);
 
-  // ***** CREO LE FUNZIONI DI FIT *****
+  // ***** FIT SULLA RESISTENZA *****
   TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 5);
   funcResistenza->SetParameters(V0_mis, R_mis, L_mis, C_mis, R_tot);
-  //funcResistenza->SetParLimits(0, 3.20, 3.22);
+  // funcResistenza->SetParLimits(0, 3.20, 3.22);
   funcResistenza->SetParLimits(1, 145, 155);
   funcResistenza->SetParLimits(3, 155E-9, 159E-9);
   funcResistenza->SetParNames("V0", "R", "L", "C", "Rtot");
@@ -530,33 +544,36 @@ void amplitude_sweep()
   funcResistenza->SetLineColor(kRed);
   graphResistenza->Fit(funcResistenza, "R");
 
-
-
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 301, 19950, 4);
-  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 301, 19950, 4);
-
+  // ***** FIT SU INDUTTANZA *****
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 4);
   funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   funcInduttanza->SetParNames("V0", "R", "L", "C");
+  funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
+  funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
-  funcInduttanza->SetLineStyle(2);
+  graphInduttanza->Fit(funcInduttanza, "R");
 
+  // ***** FIT SU CONDENSATORE *****
+
+  TF1 *funcCondensatore = new TF1("funcResistenza", amp_freq_condensatore, 301, 19950, 4);
   funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis);
   funcCondensatore->SetParNames("V0", "R", "L", "C");
   funcCondensatore->SetLineColor(kRed);
   funcCondensatore->SetLineStyle(2);
-  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
-
-  
-  graphInduttanza->Fit(funcInduttanza, "R");
   graphCondensatore->Fit(funcCondensatore, "R");
+
+  // ***** FIT SU GENERATORE *****
+
   // MANCA FIT CON POL0 DEL TOTALE
   // ***** FINE PARTE FIT *****
-  
 
-  // STAMPO RESISTENZA
-  TCanvas *cResistenza = new TCanvas();
-  graphResistenza->Draw("APE");
+  // PLOTTO GRAFICI
+  //TCanvas *cResistenza = new TCanvas();
+  //graphResistenza->Draw("APE");
+  TCanvas *cInduttanza = new TCanvas();
+  graphInduttanza->Draw("ALP");
 
+/*
   TCanvas *c1 = new TCanvas();
   c1->Divide(2, 2);
   c1->cd(1);
@@ -577,6 +594,7 @@ void amplitude_sweep()
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
+  */
   // Vedi cosa fa
 }
 
