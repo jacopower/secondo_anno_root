@@ -515,9 +515,9 @@ void rumore()
   // STAMPO
 }
 
-// CHE ERRORE SU Y ASSOCIARE QUI?
 void amplitude_sweep()
 {
+  // ***** LEGGO DATI INPUT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
   graphResistenza->SetMarkerStyle(kPlus);
@@ -536,10 +536,10 @@ void amplitude_sweep()
   graphCondensatore->SetMarkerColor(kAzure);
   graphCondensatore->SetFillColor(0);
 
-  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
+  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
-  graphTotale->SetMarkerStyle(kPlum);
-  graphTotale->SetMarkerColor(kAzure);
+  graphTotale->SetMarkerStyle(kPlus);
+  graphTotale->SetMarkerColor(kPlus);
   graphTotale->SetFillColor(0);
 
   // ***** FIT SULLA RESISTENZA *****
@@ -573,16 +573,15 @@ void amplitude_sweep()
 
   // ***** FIT SU GENERATORE *****
 
-  // MANCA FIT CON POL0 DEL TOTALE
-  // ***** FINE PARTE FIT *****
-
-  // PLOTTO GRAFICI
-  // TCanvas *cResistenza = new TCanvas();
-  // graphResistenza->Draw("APE"); // ALP
-  // TCanvas *cInduttanza = new TCanvas();
-  // graphInduttanza->Draw("APE"); // ALP
+  // ***** PLOTTO GRAFICI *****
+  TCanvas *cResistenza = new TCanvas();
+  graphResistenza->Draw("APE"); // ALP
+  TCanvas *cInduttanza = new TCanvas();
+  graphInduttanza->Draw("APE"); // ALP
   TCanvas *cCondensatore = new TCanvas();
   graphCondensatore->Draw("APE"); // ALP
+  TCanvas *cTotale = new TCanvas();
+  graphTotale->Draw("APE");
 
   /*
     TCanvas *c1 = new TCanvas();
