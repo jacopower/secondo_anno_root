@@ -583,29 +583,28 @@ void amplitude_sweep()
   TCanvas *cTotale = new TCanvas();
   graphTotale->Draw("APE");
 
-  /*
-    TCanvas *c1 = new TCanvas();
-    c1->Divide(2, 2);
-    c1->cd(1);
-    graphResistenza->Draw("APE");
-    c1->cd(2);
-    graphInduttanza->Draw("APE");
-    c1->cd(3);
-    graphCondensatore->Draw("APE");
-    c1->cd(4);
-    graphTotale->Draw("APE");
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA FA LP?
+  multiCanvas->BuildLegend();
 
-    TCanvas *multiCanvas = new TCanvas();
-    multiCanvas->cd();
-    TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-    multiGraph->Add(graphResistenza);
-    multiGraph->Add(graphInduttanza);
-    multiGraph->Add(graphCondensatore);
-    multiGraph->Add(graphTotale);
-    multiGraph->Draw("ALP"); // COSA FA LP?
-    multiCanvas->BuildLegend();
-    */
-  // Vedi cosa fa
+/*
+  TCanvas *c1 = new TCanvas();
+  c1->Divide(2, 2);
+  c1->cd(1);
+  graphResistenza->Draw("APE");
+  c1->cd(2);
+  graphInduttanza->Draw("APE");
+  c1->cd(3);
+  graphCondensatore->Draw("APE");
+  c1->cd(4);
+  graphTotale->Draw("APE");
+*/
 }
 
 // CHE ERRORE SU Y ASSOCIARE QUI?
