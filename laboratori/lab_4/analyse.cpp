@@ -609,66 +609,78 @@ void amplitude_sweep()
 
 void phase_sweep()
 {
-  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
+  /////////////////////////////////////////////////////////////////////
+  //    ATTENZIONE!                                                  //
+  //                                                                 //
+  //    VEDI LA FASE DEL GENERATORE, NON E' FISSA A ZERO, SI PUO'    //
+  //    ELIMINARE OFFSET SULLE MISURE SOTTRAENDO AI GRAFICI          //
+  //    I VALORI DELLA FASE DEL GENERATORE                           //
+  //                                                                 //
+  //    NOTA                                                         //
+  //                                                                 //
+  //    VEDI PERCHE? E' COSI'                                        //
+  //                                                                 //
+  ////////////////////////////////////////////////////////////////////
+
+  // ***** LEGGO DATI INPUT *****
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
-  graphResistenza->SetMarkerStyle(kOpenCircle);
-  graphResistenza->SetMarkerColor(kBlue);
+  graphResistenza->SetMarkerStyle(kPlus);
+  graphResistenza->SetMarkerColor(kAzure);
   graphResistenza->SetFillColor(0);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
-  graphInduttanza->SetMarkerStyle(kOpenCircle);
-  graphInduttanza->SetMarkerColor(kBlue);
+  graphInduttanza->SetMarkerStyle(kPlus);
+  graphInduttanza->SetMarkerColor(kAzure);
   graphInduttanza->SetFillColor(0);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
-  graphCondensatore->SetMarkerStyle(kOpenCircle);
-  graphCondensatore->SetMarkerColor(kBlue);
+  graphCondensatore->SetMarkerStyle(kPlus);
+  graphCondensatore->SetMarkerColor(kAzure);
   graphCondensatore->SetFillColor(0);
 
-  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_fase/sweep_phase_totale.txt", "%lg %lg %lg");
+  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_fase/sweep_phase_totale.txt", "%lg %lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Phase (RAD)");
-  graphTotale->SetMarkerStyle(kOpenCircle);
-  graphTotale->SetMarkerColor(kBlue);
+  graphTotale->SetMarkerStyle(kPlus);
+  graphTotale->SetMarkerColor(kAzure);
   graphTotale->SetFillColor(0);
 
-  // ***** CREO LE FUNZIONI DI FIT *****
-  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 0, 2E4, 3);     // LIMITI
-  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 0, 2E4, 3);     // LIMITI
-  TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 0, 2E4, 3); // LIMITI
-
+  // ***** FIT SU RESISTENZA *****
+  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 0, 2E4, 3); // LIMITI
   funcResistenza->SetParameters(R_mis, L_mis, C_mis);
   funcResistenza->SetParNames("R", "L", "C");
+  funcResistenza->SetLineWidth(2);
   funcResistenza->SetLineColor(kRed);
-  funcResistenza->SetLineStyle(2);
+  graphResistenza->Fit(funcResistenza, "R");
 
+  // ***** FIT SU INDUTTANZA *****
+  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 0, 2E4, 3); // LIMITI
   funcInduttanza->SetParameters(R_mis, L_mis, C_mis);
   funcInduttanza->SetParNames("R", "L", "C");
+  funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
-  funcInduttanza->SetLineStyle(2);
+  graphInduttanza->Fit(funcInduttanza, "R");
 
+  // ***** FIT SU CONDENSATORE *****
+  TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 0, 2E4, 3); // LIMITI
   funcCondensatore->SetParameters(R_mis, L_mis, C_mis);
   funcCondensatore->SetParNames("R", "L", "C");
+  funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
-  funcCondensatore->SetLineStyle(2);
-  // MANCA IL TOTALE, POI VEDIAMO COME SI FA
-
-  graphResistenza->Fit(funcResistenza, "R");     // OPZIONI R
-  graphInduttanza->Fit(funcInduttanza, "R");     // OPZIONI R
   graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
-  // MANCA FIT CON POL0 DEL TOTALE
-  // ***** FINE PARTE FIT *****
 
-  TCanvas *c1 = new TCanvas();
-  c1->Divide(2, 2);
-  c1->cd(1);
-  graphResistenza->Draw("APE");
-  c1->cd(2);
-  graphInduttanza->Draw("APE");
-  c1->cd(3);
-  graphCondensatore->Draw("APE");
-  c1->cd(4);
+  // ***** FIT SU TOTALE *****
+
+  // ***** PLOTTO GRAFICI *****
+  TCanvas *cResistenza = new TCanvas();
+  graphResistenza->Draw("APE"); // ALP
+  TCanvas *cInduttanza = new TCanvas();
+  graphInduttanza->Draw("APE"); // ALP
+  TCanvas *cCondensatore = new TCanvas();
+  graphCondensatore->Draw("APE"); // ALP
+  TCanvas *cTotale = new TCanvas();
   graphTotale->Draw("APE");
 
   TCanvas *multiCanvas = new TCanvas();
@@ -680,7 +692,6 @@ void phase_sweep()
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-  // Vedi cosa fa
 }
 
 void amplitude_time_sotto_risonanza()
