@@ -56,7 +56,7 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA NO
 */
 
 // VEDI QUESTI PARAMETRI
-constexpr Double_t V0_mis = 3.21514;
+constexpr Double_t V0_mis = 5;
 constexpr Double_t R_mis = 150.47;
 constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
