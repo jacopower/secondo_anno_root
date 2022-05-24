@@ -22,6 +22,8 @@ constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t R_agg = 20;
 constexpr Double_t C_agg = 1E-7; // BOH
+constexpr Double_t R_tot = R_mis + 50. + R_agg;
+constexpr Double_t C_tot = C_mis + C_agg;
 
 void setStyle()
 {
@@ -100,49 +102,19 @@ Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
   return result;
 }
 
-/*
-Double_t amp_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
-{
-  // 4 PARAMETRI
-  // par[0] = V0
-  // par[1] = R
-  // par[2] = L
-  // par[3] = C
-  Double_t xx = x[0];
-  Double_t val = TMath::TwoPi() * xx * par[2] * par[0] / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
-  return val;
-}
-*/
-
 Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
 {
   // 4 parametri
   Double_t Rtot = par[0];
   Double_t L = par[1];
   Double_t C = par[2];
-  Double_t R = par[3];
-  Double_t Ctot = C + par[4];
+  Double_t Ctot = C + par[3];
 
   Double_t xx = x[0];
   Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot));
   Double_t result = 5.0 / (TMath::TwoPi() * xx * C) / sqrt(denominatore);
   return result;
 }
-
-/*
-Double_t amp_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
-{
-  // 4 PARAMETRI
-  // par[0] = V0
-  // par[1] = R
-  // par[2] = L
-  // par[3] = C
-  Double_t xx = x[0];
-  Double_t val = par[0] / (TMath::TwoPi() * xx * par[3]) / (TMath::Sqrt(par[1] * par[1] + (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3])) * (TMath::TwoPi() * xx * par[2] - 1 / (TMath::TwoPi() * xx * par[3]))));
-  return val;
-}
-*/
-
 
 Double_t phase_freq_resistenza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
 {
@@ -541,30 +513,30 @@ void amplitude_sweep()
 
   // ***** FIT SULLA RESISTENZA *****
   TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
-  funcResistenza->SetParameters(R_tot, L_mis, C_mis, R_mis);
+  funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   // funcResistenza->SetParLimits(2, 1.5E-9, 1.65E-9);
-  funcResistenza->SetParNames("Rtot", "L", "C", "R");
+  funcResistenza->SetParNames("R_agg", "L", "C", "R");
   funcResistenza->SetLineWidth(2);
   funcResistenza->SetLineColor(kRed);
-  graphResistenza->Fit(funcResistenza, "RV");
+  graphResistenza->Fit(funcResistenza, "RQ");
 
   // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 4);
-  funcInduttanza->SetParameters(V0_mis, R_mis, L_mis, C_mis);
-  funcInduttanza->SetParNames("V0", "R", "L", "C");
-  funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
+  funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
+  funcInduttanza->SetParNames("R_tot", "L", "C_mis");
+  //funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
   funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
   graphInduttanza->Fit(funcInduttanza, "RQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 1.5E3, 5E3, 4);
-  funcCondensatore->SetParameters(V0_mis, R_mis, L_mis, C_mis);
-  funcCondensatore->SetParNames("V0", "R", "L", "C");
-  funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
+  funcCondensatore->SetParameters(R_tot, L_mis, C_mis, C_agg);
+  funcCondensatore->SetParNames("R_tot", "L", "C_mis", "C_agg");
+  //funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
   funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
-  graphCondensatore->Fit(funcCondensatore, "RQ");
+  graphCondensatore->Fit(funcCondensatore, "RV");
 
   // ***** FIT SU GENERATORE *****
 
