@@ -21,9 +21,9 @@ constexpr Double_t R_mis = 150.47;
 constexpr Double_t L_mis = 11.46 * 1E-3;
 constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t R_agg = 20;
-constexpr Double_t C_agg = 1E-7; // BOH
+constexpr Double_t C_agg = 1.22 * 1E-8;
 constexpr Double_t R_tot = R_mis + 50. + R_agg;
-constexpr Double_t C_tot = C_mis + C_agg;
+constexpr Double_t C_tot = (C_mis * C_agg) / (C_mis + C_mis); // NOTA BENE
 
 void setStyle()
 {
@@ -108,7 +108,8 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
   Double_t Rtot = par[0];
   Double_t L = par[1];
   Double_t C = par[2];
-  Double_t Ctot = C + par[3];
+  Double_t C_agg = par[3];
+  Double_t Ctot = (C_mis * C_agg) / (C_mis + C_mis);
 
   Double_t xx = x[0];
   Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot));
@@ -524,7 +525,7 @@ void amplitude_sweep()
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R_tot", "L", "C_mis");
-  //funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
+  // funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
   funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
   graphInduttanza->Fit(funcInduttanza, "RQ");
@@ -533,7 +534,7 @@ void amplitude_sweep()
   TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 1.5E3, 5E3, 4);
   funcCondensatore->SetParameters(R_tot, L_mis, C_mis, C_agg);
   funcCondensatore->SetParNames("R_tot", "L", "C_mis", "C_agg");
-  //funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
+  // funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
   funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
   graphCondensatore->Fit(funcCondensatore, "RV");
