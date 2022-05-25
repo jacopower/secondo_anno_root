@@ -1,51 +1,21 @@
-#include <iostream>
-#include <vector>
-#include "TF1.h"
-#include "TMath.h"
-#include "TGraph.h"
-#include "TCanvas.h"
 
-using namespace std;
-void Solve(vector<double> &roots, int nest, TF1 *f, double s, double e)
+TF1 *f1, *f2;
+double finter(double *x, double *par)
 {
-  double r = f->GetX(0, s, e);
-  cout << "(" << nest << ") start=" << s << " end=" << e << " root=" << r << endl;
-  roots.push_back(r);
-  if (r != s && r != e)
-  {
-    Solve(roots, nest + 1, f, s, r);
-    Solve(roots, nest + 1, f, r, e);
-  }
+  return TMath::Abs(f1->EvalPar(x, par) - f2->EvalPar(x, par));
 }
-void FindRoot()
+void fint()
 {
-  double s = -TMath::PiOver2();
-  double e = 2 * TMath::TwoPi() + TMath::PiOver2();
-  cout << "start =" << s << endl;
-  cout << "end   =" << e << endl;
-  // Create the function and wrap it
-  TF1 *f = new TF1("Sin Function", "sin(x)", s, e);
-  f->Draw();
-  vector<double> roots;
-  Solve(roots, 0, f, s, e);
-  sort(roots.begin(), roots.end());
-  double *xx = new double[roots.size()];
-  double *yy = new double[roots.size()];
-  // If this is put here; then only the first point
-  // is shown in the plot.
-  // TGraph* gr = new TGraph(7, xx, yy);
-  cout << "Found " << roots.size() << " roots:";
-  for (int i = 0; i < roots.size(); ++i)
-  {
-    xx[i] = roots[i];
-    yy[i] = 0;
-    cout << xx[i] << " ";
-  }
-  cout << endl;
-  TGraph *gr = new TGraph(7, xx, yy);
-  gr->SetMarkerColor(kRed);
-  gr->SetMarkerStyle(21);
-  gr->Draw("P");
-  c1->Update();
-  cout.flush();
+  f1 = new TF1("f1", "1+2*x+0.2*x*x", 0, 10);
+  f2 = new TF1("f2", "6+3*x-0.3*x*x", 0, 10);
+  f1->Draw();
+  f2->Draw("same");
+  TF1 *fint = new TF1("fint", finter, 0, 10, 0);
+  double xint = fint->GetMinimumX();
+  fint->Draw("lsame");
+  TMarker *m = new TMarker(xint, f1->Eval(xint), 24);
+  m->SetMarkerColor(kRed);
+  m->SetMarkerSize(3);
+  m->Draw();
+  printf("xint=%g\n", xint);
 }

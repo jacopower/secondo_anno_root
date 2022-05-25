@@ -590,7 +590,6 @@ void amplitude_sweep()
 
   // ***** FATTORE DI QUALITA' *****
   Double_t maxResistenza = funcResistenza->GetMaximum();
-
   Double_t f_min = funcResistenza->GetX(maxResistenza / sqrt(2), 1E3, 3E3);
   Double_t f_max = funcResistenza->GetX(maxResistenza / sqrt(2), 4E3, 7E3);
   Double_t f_centro = funcResistenza->GetMaximumX(3E3, 4E3);
@@ -602,6 +601,18 @@ void amplitude_sweep()
             << "F MAX: " << f_max << '\n'
             << "F0: " << f_centro << '\n'
             << "FATTORE DI QUALITA'. Q = " << Q_resistenza << '\n';
+
+  // ***** FREQUENZA RISONANZA *****
+  Double_t fRisResistenza = funcResistenza->GetMaximumX(3E3, 4E3);
+  Double_t fRisInduttanza = funcInduttanza->GetMaximumX(3E3, 4E3);
+  Double_t fRisCondensatore = funcCondensatore->GetMaximumX(3E3, 4E3);
+  Double_t fRisTotale = funcTotale->GetMinimumX(3E3, 4E3);
+
+  std::cout << "***** CALCOLO FREQUENZA RISONANZA *****" << '\n'
+            << "Da Resistenza: " << fRisResistenza << '\n'
+            << "Da Induttanza: " << fRisInduttanza << '\n'
+            << "Da Condensatore: " << fRisCondensatore << '\n'
+            << "Da Totale: " << fRisTotale << '\n';
 
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas();
@@ -705,6 +716,20 @@ void phase_sweep()
             << "NDF: " << NdofCondensatore << '\n';
   covCondensatore.Print();
 
+  // ***** CALCOLO RISONANZA *****
+  Double_t fRisResistenza = funcResistenza->GetX(0., 3E3, 4E3);
+  //ROOT::Math::RootFinder finder;
+  //finder.Solve(*funcResistenza, 3E3, 4E3);
+  //Double_t fRisResistenza = finder.Root();
+  Double_t fRisInduttanza = funcInduttanza->GetX(TMath::PiOver2(), 3E3, 4E3);
+  Double_t fRisCondensatore = funcCondensatore->GetX(-TMath::PiOver2(), 3E3, 4E3);
+
+  std::cout << '\n'
+            << "***** FREQUENZA RISONANZA *****" << '\n'
+            << "Da Resistenza: " << fRisResistenza << '\n'
+            << "Da Induttanza: " << fRisInduttanza << '\n'
+            << "Da Condensatore: " << fRisCondensatore << '\n';
+
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas();
   graphResistenza->Draw("APE"); // ALP
@@ -712,8 +737,8 @@ void phase_sweep()
   graphInduttanza->Draw("APE"); // ALP
   TCanvas *cCondensatore = new TCanvas();
   graphCondensatore->Draw("APE"); // ALP
-  //TCanvas *cTotale = new TCanvas();
-  //graphTotale->Draw("APE");
+  // TCanvas *cTotale = new TCanvas();
+  // graphTotale->Draw("APE");
 
   TCanvas *multiCanvas = new TCanvas();
   multiCanvas->cd();
