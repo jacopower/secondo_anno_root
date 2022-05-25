@@ -24,8 +24,8 @@ constexpr Double_t R_agg = 20;
 constexpr Double_t R_tot = R_mis + 50. + R_agg;
 
 constexpr Double_t C_mis = 157.8 * 1E-9;
-constexpr Double_t C_tot = 170 * 1E-9; // VEDI COME IMPOSTARE QUESTO
-constexpr Double_t C_agg = (C_tot * C_mis) / (C_mis - C_tot); // -2.2nF
+constexpr Double_t C_tot = 177 * 1E-9;
+constexpr Double_t C_agg = C_tot - C_mis;
 
 void setStyle()
 {
@@ -109,13 +109,25 @@ Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
   Double_t Rtot = par[0];
   Double_t L = par[1];
   Double_t C = par[2];
-  Double_t Cagg = par[3];
-  Double_t Ctot = (C * Cagg) / (C + Cagg);
 
   Double_t xx = x[0];
 
-  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * Ctot));
+  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
   Double_t result = 5.0 / (TMath::TwoPi() * xx * C) / sqrt(denominatore);
+  return result;
+}
+
+Double_t amp_freq_totale(Double_t *x, Double_t *par)
+{
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
+  Double_t xx = x[0];
+
+  Double_t numeratore = (R - 50.) * (R - 50.) + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t denominatore = R * R + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t result = 5.0 * sqrt(numeratore / denominatore);
   return result;
 }
 
@@ -511,17 +523,25 @@ void amplitude_sweep()
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
   graphTotale->SetMarkerStyle(kPlus);
-  graphTotale->SetMarkerColor(kPlus);
+  graphTotale->SetMarkerColor(kAzure);
   graphTotale->SetFillColor(0);
 
   // ***** FIT SULLA RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 400, 19E3, 4);
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   // funcResistenza->SetParLimits(2, 1.5E-9, 1.65E-9);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
   funcResistenza->SetLineWidth(2);
   funcResistenza->SetLineColor(kRed);
-  graphResistenza->Fit(funcResistenza, "RQ");
+  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+  TMatrixD covResistenza = rResistenza->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT RESISTENZA *****" << '\n';
+  Double_t ChiResistenza = funcResistenza->GetChisquare();
+  Double_t NdofResistenza = funcResistenza->GetNDF();
+  std::cout << "ChiSquare: " << ChiResistenza << '\n'
+            << "NDF: " << NdofResistenza << '\n';
+  covResistenza.Print();
 
   // ***** FIT SU INDUTTANZA *****
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
@@ -533,15 +553,36 @@ void amplitude_sweep()
   graphInduttanza->Fit(funcInduttanza, "RQ");
 
   // ***** FIT SU CONDENSATORE *****
-  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 1.5E3, 5E3, 4);
-  funcCondensatore->SetParameters(R_tot, L_mis, C_mis, C_agg);
-  funcCondensatore->SetParNames("R_tot", "L", "C_mis", "C_agg");
-  // funcCondensatore->SetParLimits(3, 155E-9, 159E-9);
+  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 2E3, 4E3, 3);
+  funcCondensatore->SetParameters(R_tot, L_mis, C_mis);
+  funcCondensatore->SetParNames("R_tot", "L", "C_mis");
   funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
-  graphCondensatore->Fit(funcCondensatore, "RV");
+  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
+  TMatrixD covCondensatore = rCondensatore->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT CONDENSATORE *****" << '\n';
+  Double_t ChiCondensatore = funcCondensatore->GetChisquare();
+  Double_t NdofCondensatore = funcCondensatore->GetNDF();
+  std::cout << "ChiSquare: " << ChiCondensatore << '\n'
+            << "NDF: " << NdofCondensatore << '\n';
+  covCondensatore.Print();
 
   // ***** FIT SU GENERATORE *****
+  TF1 *funcTotale = new TF1("funcTotale", amp_freq_totale, 2E3, 6E3, 3);
+  funcTotale->SetParameters(R_tot, L_mis, C_mis);
+  funcTotale->SetParNames("Rtot", "L", "C");
+  funcTotale->SetLineWidth(2);
+  funcTotale->SetLineColor(kRed);
+  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSV");
+  TMatrixD covTotale = rTotale->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT TOTALE GENERATORE *****" << '\n';
+  Double_t ChiTotale = funcTotale->GetChisquare();
+  Double_t NdofTotale = funcTotale->GetNDF();
+  std::cout << "ChiSquare: " << ChiTotale << '\n'
+            << "NDF: " << NdofTotale << '\n';
+  covTotale.Print();
 
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas();
