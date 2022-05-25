@@ -14,6 +14,7 @@
 #include "TList.h"
 #include "TFitResultPtr.h"
 #include "TMatrixD.h"
+#include "TLine.h"
 
 // VEDI QUESTI PARAMETRI
 constexpr Double_t V0_mis = 5;
@@ -718,9 +719,9 @@ void phase_sweep()
 
   // ***** CALCOLO RISONANZA *****
   Double_t fRisResistenza = funcResistenza->GetX(0., 3E3, 4E3);
-  //ROOT::Math::RootFinder finder;
-  //finder.Solve(*funcResistenza, 3E3, 4E3);
-  //Double_t fRisResistenza = finder.Root();
+  // ROOT::Math::RootFinder finder;
+  // finder.Solve(*funcResistenza, 3E3, 4E3);
+  // Double_t fRisResistenza = finder.Root();
   Double_t fRisInduttanza = funcInduttanza->GetX(TMath::PiOver2(), 3E3, 4E3);
   Double_t fRisCondensatore = funcCondensatore->GetX(-TMath::PiOver2(), 3E3, 4E3);
 
@@ -747,6 +748,40 @@ void phase_sweep()
   multiGraph->Add(graphInduttanza);
   multiGraph->Add(graphCondensatore);
   multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA FA LP?
+  multiCanvas->BuildLegend();
+}
+
+void phase_offset()
+{
+  // ***** LEGGO DATI INPUT *****
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase_traslato/resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
+  graphResistenza->SetMarkerStyle(kPlus);
+  graphResistenza->SetMarkerColor(kAzure);
+  graphResistenza->SetFillColor(0);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase_traslato/induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
+  graphInduttanza->SetMarkerStyle(kPlus);
+  graphInduttanza->SetMarkerColor(kRed);
+  graphInduttanza->SetFillColor(0);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase_traslato/condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
+  graphCondensatore->SetMarkerStyle(kPlus);
+  graphCondensatore->SetMarkerColor(kGreen);
+  graphCondensatore->SetFillColor(0);
+
+  //TLine *line1 = new TLine(500, 0, 500, 1);
+
+  // ***** MULTIPLOT *****
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
 }
