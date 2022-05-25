@@ -131,37 +131,43 @@ Double_t amp_freq_totale(Double_t *x, Double_t *par)
   return result;
 }
 
-Double_t phase_freq_resistenza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+Double_t phase_freq_resistenza(Double_t *x, Double_t *par)
 {
-  // 3 PARAMETRI
-  // par[0] = R
-  // par[1] = L
-  // par[2] = C
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * TMath::Pi() * 2 * xx * TMath::Pi() * 2 * par[1] * par[2]) / (xx * TMath::Pi() * 2 * par[0] * par[2]));
-  return val;
+
+  Double_t fase = (1 - TMath::TwoPi() * TMath::TwoPi() * xx * xx * L * C) / (R * TMath::TwoPi() * xx * C);
+  Double_t result = TMath::ATan(fase);
+  return result;
 }
 
-Double_t phase_freq_induttanza(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+Double_t phase_freq_induttanza(Double_t *x, Double_t *par)
 {
-  // 3 PARAMETRI
-  // par[0] = R
-  // par[1] = L
-  // par[2] = C
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * TMath::Pi() * 2 * xx * TMath::Pi() * 2 * par[1] * par[2]) / (xx * TMath::Pi() * 2 * par[0] * par[2])) + TMath::PiOver2();
-  return val;
+
+  Double_t fase = (1 - TMath::TwoPi() * TMath::TwoPi() * xx * xx * L * C) / (R * TMath::TwoPi() * xx * C);
+  Double_t result = TMath::ATan(fase) + TMath::PiOver2();
+  return result;
 }
 
-Double_t phase_freq_condensatore(Double_t *x, Double_t *par) // E' LA FREQUENZA NON W
+Double_t phase_freq_condensatore(Double_t *x, Double_t *par)
 {
-  // 3 PARAMETRI
-  // par[0] = R
-  // par[1] = L
-  // par[2] = C
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
   Double_t xx = x[0];
-  Double_t val = TMath::ATan((1 - xx * TMath::Pi() * 2 * xx * TMath::Pi() * 2 * par[1] * par[2]) / (xx * TMath::Pi() * 2 * par[0] * par[2])) - TMath::PiOver2();
-  return val;
+
+  Double_t fase = (1 - TMath::TwoPi() * TMath::TwoPi() * xx * xx * L * C) / (R * TMath::TwoPi() * xx * C);
+  Double_t result = TMath::ATan(fase) - TMath::PiOver2();
+  return result;
 }
 
 void rumore()
@@ -661,27 +667,43 @@ void phase_sweep()
 
   // ***** FIT SU RESISTENZA *****
   TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 0, 2E4, 3); // LIMITI
-  funcResistenza->SetParameters(R_mis, L_mis, C_mis);
+  funcResistenza->SetParameters(R_tot, L_mis, C_tot);
   funcResistenza->SetParNames("R", "L", "C");
   funcResistenza->SetLineWidth(2);
   funcResistenza->SetLineColor(kRed);
-  graphResistenza->Fit(funcResistenza, "R");
+  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+  TMatrixD covResistenza = rResistenza->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT RESISTENZA *****" << '\n';
+  Double_t ChiResistenza = funcResistenza->GetChisquare();
+  Double_t NdofResistenza = funcResistenza->GetNDF();
+  std::cout << "ChiSquare: " << ChiResistenza << '\n'
+            << "NDF: " << NdofResistenza << '\n';
+  covResistenza.Print();
 
   // ***** FIT SU INDUTTANZA *****
   TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 0, 2E4, 3); // LIMITI
-  funcInduttanza->SetParameters(R_mis, L_mis, C_mis);
+  funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R", "L", "C");
   funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
-  graphInduttanza->Fit(funcInduttanza, "R");
+  graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 0, 2E4, 3); // LIMITI
-  funcCondensatore->SetParameters(R_mis, L_mis, C_mis);
+  funcCondensatore->SetParameters(R_tot, L_mis, C_tot);
   funcCondensatore->SetParNames("R", "L", "C");
   funcCondensatore->SetLineWidth(2);
   funcCondensatore->SetLineColor(kRed);
-  graphCondensatore->Fit(funcCondensatore, "R"); // OPZIONI R
+  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
+  TMatrixD covCondensatore = rCondensatore->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT CONDENSATORE *****" << '\n';
+  Double_t ChiCondensatore = funcCondensatore->GetChisquare();
+  Double_t NdofCondensatore = funcCondensatore->GetNDF();
+  std::cout << "ChiSquare: " << ChiCondensatore << '\n'
+            << "NDF: " << NdofCondensatore << '\n';
+  covCondensatore.Print();
 
   // ***** FIT SU TOTALE *****
 
