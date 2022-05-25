@@ -527,9 +527,8 @@ void amplitude_sweep()
   graphTotale->SetFillColor(0);
 
   // ***** FIT SULLA RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 400, 19E3, 4);
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
-  // funcResistenza->SetParLimits(2, 1.5E-9, 1.65E-9);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
   funcResistenza->SetLineWidth(2);
   funcResistenza->SetLineColor(kRed);
@@ -547,10 +546,9 @@ void amplitude_sweep()
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R_tot", "L", "C_mis");
-  // funcInduttanza->SetParLimits(3, 155E-9, 159E-9);
   funcInduttanza->SetLineWidth(2);
   funcInduttanza->SetLineColor(kRed);
-  graphInduttanza->Fit(funcInduttanza, "RQ");
+  graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 2E3, 4E3, 3);
@@ -574,7 +572,7 @@ void amplitude_sweep()
   funcTotale->SetParNames("Rtot", "L", "C");
   funcTotale->SetLineWidth(2);
   funcTotale->SetLineColor(kRed);
-  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSV");
+  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
   TMatrixD covTotale = rTotale->GetCovarianceMatrix();
   std::cout << '\n'
             << "***** MATRICE COVARIANZA FIT TOTALE GENERATORE *****" << '\n';
@@ -584,9 +582,25 @@ void amplitude_sweep()
             << "NDF: " << NdofTotale << '\n';
   covTotale.Print();
 
+  // ***** FATTORE DI QUALITA' *****
+  Double_t maxResistenza = funcResistenza->GetMaximum();
+
+  Double_t f_min = funcResistenza->GetX(maxResistenza / sqrt(2), 1E3, 3E3);
+  Double_t f_max = funcResistenza->GetX(maxResistenza / sqrt(2), 4E3, 7E3);
+  Double_t f_centro = funcResistenza->GetMaximumX(3E3, 4E3);
+  Double_t Q_resistenza = f_centro / (f_max - f_min);
+
+  std::cout << "***** CALCOLO FATTORE DI QUALITA' *****" << '\n'
+            << "Massimo: " << maxResistenza << '\n'
+            << "F MIN: " << f_min << '\n'
+            << "F MAX: " << f_max << '\n'
+            << "F0: " << f_centro << '\n'
+            << "FATTORE DI QUALITA'. Q = " << Q_resistenza << '\n';
+
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas();
   graphResistenza->Draw("APE"); // ALP
+  gPad->SetLogx();
   TCanvas *cInduttanza = new TCanvas();
   graphInduttanza->Draw("APE"); // ALP
   TCanvas *cCondensatore = new TCanvas();
@@ -603,19 +617,6 @@ void amplitude_sweep()
   multiGraph->Add(graphTotale);
   multiGraph->Draw("ALP"); // COSA FA LP?
   multiCanvas->BuildLegend();
-
-  /*
-    TCanvas *c1 = new TCanvas();
-    c1->Divide(2, 2);
-    c1->cd(1);
-    graphResistenza->Draw("APE");
-    c1->cd(2);
-    graphInduttanza->Draw("APE");
-    c1->cd(3);
-    graphCondensatore->Draw("APE");
-    c1->cd(4);
-    graphTotale->Draw("APE");
-  */
 }
 
 void phase_sweep()
