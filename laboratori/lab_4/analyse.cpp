@@ -666,7 +666,7 @@ void phase_sweep()
   graphTotale->SetFillColor(0);
 
   // ***** FIT SU RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 0, 2E4, 3); // LIMITI
+  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 400, 6E3, 3); // LIMITI
   funcResistenza->SetParameters(R_tot, L_mis, C_tot);
   funcResistenza->SetParNames("R", "L", "C");
   funcResistenza->SetLineWidth(2);
@@ -682,7 +682,7 @@ void phase_sweep()
   covResistenza.Print();
 
   // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 0, 2E4, 3); // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 400, 6E3, 3); // LIMITI
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R", "L", "C");
   funcInduttanza->SetLineWidth(2);
@@ -690,7 +690,7 @@ void phase_sweep()
   graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
-  TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 0, 2E4, 3); // LIMITI
+  TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 400, 6E3, 3); // LIMITI
   funcCondensatore->SetParameters(R_tot, L_mis, C_tot);
   funcCondensatore->SetParNames("R", "L", "C");
   funcCondensatore->SetLineWidth(2);
