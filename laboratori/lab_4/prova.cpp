@@ -1,21 +1,23 @@
-
-TF1 *f1, *f2;
-double finter(double *x, double *par)
+TCanvas * fonts()
 {
-  return TMath::Abs(f1->EvalPar(x, par) - f2->EvalPar(x, par));
+   TCanvas *Tf = new TCanvas("Tf", "Tf",0,0,500,700);
+   Tf->Range(0,0,1,1);
+   Tf->SetBorderSize(2);
+   Tf->SetFrameFillColor(0);
+                                                                                
+   double y = 0.95;
+   for (int f = 12; f<=142; f+=10) {
+      if (f<142) drawtext(0.02,y, f,"ABCDFGF abcdefgh 0123456789 @#$");
+      else drawtext(0.02,y, f,"ABCD efgh 01234 @#$");
+      y- = 0.07;
+   }
+   return Tf;
 }
-void fint()
+
+void drawtext(double x, double y, int f, char *s)
 {
-  f1 = new TF1("f1", "1+2*x+0.2*x*x", 0, 10);
-  f2 = new TF1("f2", "6+3*x-0.3*x*x", 0, 10);
-  f1->Draw();
-  f2->Draw("same");
-  TF1 *fint = new TF1("fint", finter, 0, 10, 0);
-  double xint = fint->GetMinimumX();
-  fint->Draw("lsame");
-  TMarker *m = new TMarker(xint, f1->Eval(xint), 24);
-  m->SetMarkerColor(kRed);
-  m->SetMarkerSize(3);
-  m->Draw();
-  printf("xint=%g\n", xint);
+   TLatex *t = new TLatex(x,y,Form("#font[41]{%d :} %s",f,s));
+   t->SetTextFont(f);
+   t->SetTextAlign(12);
+   t->Draw();
 }

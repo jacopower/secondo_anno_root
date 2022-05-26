@@ -28,6 +28,9 @@ constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t C_tot = 177 * 1E-9;
 constexpr Double_t C_agg = C_tot - C_mis;
 
+constexpr Double_t width = 1280;
+constexpr Double_t height = 720;
+
 void setStyle()
 {
   gROOT->SetStyle("Plain");
@@ -35,6 +38,33 @@ void setStyle()
   gStyle->SetOptTitle(1);
   gStyle->SetOptStat(112210);
   gStyle->SetOptFit(111111);
+}
+
+void setGraphicsGraph(TGraphErrors *name)
+{
+  // *****  ASSE X *****
+  name->SetMarkerStyle(kPlus);
+  name->SetMarkerColor(kAzure);
+  name->SetFillColor(0);
+
+  name->GetXaxis()->SetAxisColor(kRed);
+  name->GetXaxis()->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+
+  name->GetXaxis()->SetTitleOffset(1.2);
+  name->GetXaxis()->SetTitleSize(0.03);
+
+  name->GetXaxis()->SetLabelColor(kGreen);
+  name->GetXaxis()->SetLabelFont(1);
+  name->GetXaxis()->SetLabelSize(0.03);
+  name->GetXaxis()->SetLabelOffset(0.01);
+
+  name->GetXaxis()->SetNdivisions(1010); // 10 divsioni secondarie, 10 divisioni primarie
+  name->GetXaxis()->SetTickSize(0.01);
+  //name->GetXaxis()->SetTickLength(0.05);
+
+  // ***** ASSE Y *****
+
+  // *****  *****
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -526,30 +556,24 @@ void rumore()
 
 void amplitude_sweep()
 {
+  setStyle();
   // ***** LEGGO DATI INPUT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
-  graphResistenza->SetMarkerStyle(kPlus);
-  graphResistenza->SetMarkerColor(kAzure);
-  graphResistenza->SetFillColor(0);
+  graphResistenza->GetXaxis()->SetTitleColor(kRed);
+  setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Amplitude (V)");
-  graphInduttanza->SetMarkerStyle(kPlus);
-  graphInduttanza->SetMarkerColor(kAzure);
-  graphInduttanza->SetFillColor(0);
+  setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Amplitude (V)");
-  graphCondensatore->SetMarkerStyle(kPlus);
-  graphCondensatore->SetMarkerColor(kAzure);
-  graphCondensatore->SetFillColor(0);
+  setGraphicsGraph(graphCondensatore);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
-  graphTotale->SetMarkerStyle(kPlus);
-  graphTotale->SetMarkerColor(kAzure);
-  graphTotale->SetFillColor(0);
+  setGraphicsGraph(graphTotale);
 
   // ***** FIT SULLA RESISTENZA *****
   TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
@@ -634,25 +658,28 @@ void amplitude_sweep()
             << "Da Totale: " << fRisTotale << '\n';
 
   // ***** PLOTTO GRAFICI *****
-  TCanvas *cResistenza = new TCanvas();
-  graphResistenza->Draw("APE"); // ALP
-  gPad->SetLogx();
-  TCanvas *cInduttanza = new TCanvas();
-  graphInduttanza->Draw("APE"); // ALP
-  TCanvas *cCondensatore = new TCanvas();
-  graphCondensatore->Draw("APE"); // ALP
-  TCanvas *cTotale = new TCanvas();
-  graphTotale->Draw("APE");
+  TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
 
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  multiGraph->Add(graphResistenza);
-  multiGraph->Add(graphInduttanza);
-  multiGraph->Add(graphCondensatore);
-  multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA FA LP?
-  multiCanvas->BuildLegend();
+  // TCanvas *cResistenza = new TCanvas();
+  graphResistenza->Draw("APE"); // ALP
+  // gPad->SetLogx();
+  // TCanvas *cInduttanza = new TCanvas();
+  // graphInduttanza->Draw("APE"); // ALP
+  // TCanvas *cCondensatore = new TCanvas();
+  // graphCondensatore->Draw("APE"); // ALP
+  // TCanvas *cTotale = new TCanvas();
+  // graphTotale->Draw("APE");
+  /*
+    TCanvas *multiCanvas = new TCanvas();
+    multiCanvas->cd();
+    TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+    multiGraph->Add(graphResistenza);
+    multiGraph->Add(graphInduttanza);
+    multiGraph->Add(graphCondensatore);
+    multiGraph->Add(graphTotale);
+    multiGraph->Draw("ALP"); // COSA FA LP?
+    multiCanvas->BuildLegend();
+    */
 }
 
 void phase_sweep()
@@ -898,7 +925,7 @@ void amplitude_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
 void amplitude_time_in_risonanza() // FREQUENZA = 3.5301 KHz
 {
-   constexpr Double_t f_mis = 3530.1;
+  constexpr Double_t f_mis = 3530.1;
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
