@@ -40,15 +40,15 @@ void setStyle()
   //  VEDI TUTTE LE OPZIONI DI FONT
   // gStyle->SetStatFont()
   // gStyle->SetPalette(57); // NON CAPISCO CHE FA
-  gStyle->SetOptTitle(0);
+  gStyle->SetOptTitle(1);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
 {
   // ***** GRAFICO *****
-  graph->SetMarkerStyle(kPlus);
+  graph->SetMarkerStyle(kFullCircle);
   graph->SetMarkerColor(kAzure - 1);
   // graph->SetMarkerSize(8);
   // graph->SetFillColor(0);
@@ -626,66 +626,28 @@ void amplitude_sweep()
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
   setGraphicsFit(funcResistenza);
-
   TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
-  TMatrixD covResistenza = rResistenza->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT RESISTENZA *****" << '\n';
-  Double_t ChiResistenza = funcResistenza->GetChisquare();
-  Double_t NdofResistenza = funcResistenza->GetNDF();
-  std::cout << "ChiSquare: " << ChiResistenza << '\n'
-            << "NDF: " << NdofResistenza << '\n';
-  covResistenza.Print();
 
   // ***** FIT SU INDUTTANZA *****
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
-  funcInduttanza->SetParNames("R_tot", "L", "C_mis");
+  funcInduttanza->SetParNames("R_tot", "L", "C_tot");
   setGraphicsFit(funcInduttanza);
-
   TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
-  TMatrixD covInduttanza = rInduttanza->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT INDUTTANZA *****" << '\n';
-  Double_t ChiInduttanza = funcInduttanza->GetChisquare();
-  Double_t NdofInduttanza = funcInduttanza->GetNDF();
-  std::cout << "ChiSquare: " << ChiInduttanza << '\n'
-            << "NDF: " << NdofInduttanza << '\n';
-  covInduttanza.Print();
-
-  graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 2E3, 4E3, 3);
   funcCondensatore->SetParameters(R_tot, L_mis, C_mis);
   funcCondensatore->SetParNames("R_tot", "L", "C_mis");
   setGraphicsFit(funcCondensatore);
-
   TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
-  TMatrixD covCondensatore = rCondensatore->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT CONDENSATORE *****" << '\n';
-  Double_t ChiCondensatore = funcCondensatore->GetChisquare();
-  Double_t NdofCondensatore = funcCondensatore->GetNDF();
-  std::cout << "ChiSquare: " << ChiCondensatore << '\n'
-            << "NDF: " << NdofCondensatore << '\n';
-  covCondensatore.Print();
 
   // ***** FIT SU GENERATORE *****
   TF1 *funcTotale = new TF1("funcTotale", amp_freq_totale, 2E3, 6E3, 3);
   funcTotale->SetParameters(R_tot, L_mis, C_mis);
   funcTotale->SetParNames("Rtot", "L", "C");
   setGraphicsFit(funcTotale);
-
   TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
-  TMatrixD covTotale = rTotale->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT TOTALE GENERATORE *****" << '\n';
-  Double_t ChiTotale = funcTotale->GetChisquare();
-  Double_t NdofTotale = funcTotale->GetNDF();
-  std::cout << "ChiSquare: " << ChiTotale << '\n'
-            << "NDF: " << NdofTotale << '\n';
-  covTotale.Print();
 
   // ***** FATTORE DI QUALITA' *****
   Double_t maxResistenza = funcResistenza->GetMaximum();
@@ -717,40 +679,41 @@ void amplitude_sweep()
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
   // cResistenza->SetLogx();
-  graphResistenza->Draw("APE");                                        // L=polyline C=SmoothCurve
-  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
-  boxResistenza->AddText("A TPaveText can contain severals line of text.");
-  boxResistenza->AddText("They are added to the pave using the AddText method.");
-  boxResistenza->AddLine(.0, .5, 1., .5);
-  boxResistenza->AddText("Even complex TLatex formulas can be added:");
-  TText *t1 = boxResistenza->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
-  t1->SetTextColor(kBlue);
-  TText *t2 = boxResistenza->GetLineWith("Even");
-  t2->SetTextColor(kOrange + 1);
-  boxResistenza->Draw();
+  graphResistenza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+
+  // TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
+  // boxResistenza->AddText("A TPaveText can contain severals line of text.");
+  // boxResistenza->AddText("They are added to the pave using the AddText method.");
+  // boxResistenza->AddLine(.0, .5, 1., .5);
+  // boxResistenza->AddText("Even complex TLatex formulas can be added:");
+  // TText *t1 = boxResistenza->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
+  // t1->SetTextColor(kBlue);
+  // TText *t2 = boxResistenza->GetLineWith("Even");
+  // t2->SetTextColor(kOrange + 1);
+  // boxResistenza->Draw();
 
   TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
   setGraphicsCanvas(cInduttanza);
-  graphInduttanza->Draw("APE"); // L=polyline C=SmoothCurve
+  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
   TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
   setGraphicsCanvas(cCondensatore);
-  graphCondensatore->Draw("APE"); // L=polyline C=SmoothCurve
+  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
   TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
   setGraphicsCanvas(cTotale);
-  graphTotale->Draw("APE"); // L=polyline C=SmoothCurve
+  graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  setGraphicsCanvas(multiCanvas);
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  multiGraph->Add(graphResistenza);
-  multiGraph->Add(graphInduttanza);
-  multiGraph->Add(graphCondensatore);
-  multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA FA LP?
-  multiCanvas->BuildLegend();
+  // TCanvas *multiCanvas = new TCanvas();
+  // multiCanvas->cd();
+  // setGraphicsCanvas(multiCanvas);
+  // TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  // multiGraph->Add(graphResistenza);
+  // multiGraph->Add(graphInduttanza);
+  // multiGraph->Add(graphCondensatore);
+  // multiGraph->Add(graphTotale);
+  // multiGraph->Draw("ALP"); // COSA FA LP?
+  // multiCanvas->BuildLegend();
 }
 
 void phase_sweep()
