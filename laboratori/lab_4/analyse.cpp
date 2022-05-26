@@ -40,47 +40,66 @@ void setStyle()
   //  VEDI TUTTE LE OPZIONI DI FONT
   // gStyle->SetStatFont()
   // gStyle->SetPalette(57); // NON CAPISCO CHE FA
-  gStyle->SetOptTitle(1);
+  gStyle->SetOptTitle(0);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
 {
+  // ***** GRAFICO *****
+  graph->SetMarkerStyle(kPlus);
+  graph->SetMarkerColor(kAzure - 1);
+  // graph->SetMarkerSize(8);
+  // graph->SetFillColor(0);
+
   // *****  ASSE X *****
   TAxis *asseX = graph->GetXaxis();
 
-  graph->SetMarkerStyle(kPlus);
-  graph->SetMarkerColor(kAzure);
-  graph->SetMarkerSize(3);
-  graph->SetFillColor(0);
-
-  asseX->SetTitleOffset(1.2);
+  asseX->SetTitleOffset(1.4);
   asseX->SetTitleSize(0.03);
-  asseX->SetTitleColor(kBlue);
+  // asseX->SetTitleColor(kBlue);
+  asseX->SetTitleFont(1);
 
-  asseX->SetAxisColor(kRed);
+  // asseX->SetAxisColor(kRed);
   asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
-  // asseX->SetNoExponent(); no exp su assi
+  asseX->SetNoExponent(); // no exp su assi
 
-  asseX->SetLabelColor(kGreen);
+  // asseX->SetLabelColor(kGreen);
   asseX->SetLabelFont(1);
-  asseX->SetLabelSize(0.03);
+  asseX->SetLabelSize(0.025);
   asseX->SetLabelOffset(0.01);
 
-  asseX->SetNdivisions(1030); // 10 divsioni secondarie, 30 divisioni primarie
-  asseX->SetTickSize(0.01);
-  // name->GetXaxis()->SetTickLength(0.05);
+  asseX->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
+  // asseX->SetTickSize(0.03);
+  // asseX->SetTickLength(0.03);
 
   // ***** ASSE Y *****
   TAxis *asseY = graph->GetYaxis();
-  // asseY->SetLimits(0, 5);
+
+  asseY->SetTitleOffset(1.4);
+  asseY->SetTitleSize(0.03);
+  // asseY->SetTitleColor(kBlue);
+  asseY->SetTitleFont(1);
+
+  // asseY->SetAxisColor(kRed);
+  asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+  asseY->SetNoExponent(); // no exp su assi
+
+  // asseY->SetLabelColor(kGreen);
+  asseY->SetLabelFont(1);
+  asseY->SetLabelSize(0.025);
+  asseY->SetLabelOffset(0.01);
+
+  asseY->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
+  // asseY->SetTickSize(0.03);
+  // asseY->SetTickLength(0.03);
 }
 
 void setGraphicsFit(TF1 *func)
 {
-  func->SetLineStyle(2);
-  func->SetLineWidth(8);
+  // func->SetLineStyle(2);
+  func->SetLineWidth(2);
   func->SetLineColor(kRed);
 }
 
@@ -90,27 +109,9 @@ void setGraphicsCanvas(TCanvas *c)
   c->SetGridx();
   c->SetGridy();
 
-  c->SetFrameFillColor(21);
-  c->SetFrameLineColor(kRed);
-  c->SetFrameLineWidth(12);
-}
-
-TPaveText *setBoxParameters(TCanvas *c)
-{
-  TPaveText *boxParametri = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
-  boxParametri->AddText("A TPaveText can contain severals line of text.");
-  boxParametri->AddText("They are added to the pave using the AddText method.");
-  boxParametri->AddLine(.0, .5, 1., .5);
-  boxParametri->AddText("Even complex TLatex formulas can be added:");
-  TText *t1 = boxParametri->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
-  t1->SetTextColor(kBlue);
-  TText *t2 = boxParametri->GetLineWith("Even");
-  t2->SetTextColor(kOrange + 1);
-  return boxParametri;
-}
-
-TPaveText *setTitleCanvas(TCanvas *c)
-{
+  // c->SetFrameFillColor(21);
+  // c->SetFrameLineColor(kRed);
+  c->SetFrameLineWidth(2);
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -642,6 +643,16 @@ void amplitude_sweep()
   funcInduttanza->SetParNames("R_tot", "L", "C_mis");
   setGraphicsFit(funcInduttanza);
 
+  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
+  TMatrixD covInduttanza = rInduttanza->GetCovarianceMatrix();
+  std::cout << '\n'
+            << "***** MATRICE COVARIANZA FIT INDUTTANZA *****" << '\n';
+  Double_t ChiInduttanza = funcInduttanza->GetChisquare();
+  Double_t NdofInduttanza = funcInduttanza->GetNDF();
+  std::cout << "ChiSquare: " << ChiInduttanza << '\n'
+            << "NDF: " << NdofInduttanza << '\n';
+  covInduttanza.Print();
+
   graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
@@ -706,42 +717,40 @@ void amplitude_sweep()
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
   // cResistenza->SetLogx();
-  graphResistenza->Draw("APE"); // L=polyline C=SmoothCurve
-  TPaveText *boxResistenza = setBoxParameters(cResistenza);
+  graphResistenza->Draw("APE");                                        // L=polyline C=SmoothCurve
+  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
+  boxResistenza->AddText("A TPaveText can contain severals line of text.");
+  boxResistenza->AddText("They are added to the pave using the AddText method.");
+  boxResistenza->AddLine(.0, .5, 1., .5);
+  boxResistenza->AddText("Even complex TLatex formulas can be added:");
+  TText *t1 = boxResistenza->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
+  t1->SetTextColor(kBlue);
+  TText *t2 = boxResistenza->GetLineWith("Even");
+  t2->SetTextColor(kOrange + 1);
   boxResistenza->Draw();
 
-  // TPaveText *pt = new TPaveText(1., 1., .7, .7, "NDC, NB"); //NDC=CoordinateRelative NB=noBorders
-  // pt->AddText("A TPaveText can contain severals line of text.");
-  // pt->AddText("They are added to the pave using the AddText method.");
-  // pt->AddLine(.0, .5, 1., .5);
-  // pt->AddText("Even complex TLatex formulas can be added:");
-  // TText *t1 = pt->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
-  // t1->SetTextColor(kBlue);
-  // pt->Draw();
+  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
+  setGraphicsCanvas(cInduttanza);
+  graphInduttanza->Draw("APE"); // L=polyline C=SmoothCurve
 
-  // TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
-  // setGraphicsCanvas(cInduttanza);
-  // graphInduttanza->Draw("APE"); // L=polyline C=SmoothCurve
+  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
+  setGraphicsCanvas(cCondensatore);
+  graphCondensatore->Draw("APE"); // L=polyline C=SmoothCurve
 
-  // TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
-  // setGraphicsCanvas(cCondensatore);
-  // graphCondensatore->Draw("APE"); // L=polyline C=SmoothCurve
+  TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
+  setGraphicsCanvas(cTotale);
+  graphTotale->Draw("APE"); // L=polyline C=SmoothCurve
 
-  // TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
-  // setGraphicsCanvas(cTotale);
-  // graphTotale->Draw("APE"); // L=polyline C=SmoothCurve
-
-  /*
-      TCanvas *multiCanvas = new TCanvas();
-      multiCanvas->cd();
-      TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-      multiGraph->Add(graphResistenza);
-      multiGraph->Add(graphInduttanza);
-      multiGraph->Add(graphCondensatore);
-      multiGraph->Add(graphTotale);
-      multiGraph->Draw("ALP"); // COSA FA LP?
-      multiCanvas->BuildLegend();
-      */
+  TCanvas *multiCanvas = new TCanvas();
+  multiCanvas->cd();
+  setGraphicsCanvas(multiCanvas);
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+  multiGraph->Add(graphResistenza);
+  multiGraph->Add(graphInduttanza);
+  multiGraph->Add(graphCondensatore);
+  multiGraph->Add(graphTotale);
+  multiGraph->Draw("ALP"); // COSA FA LP?
+  multiCanvas->BuildLegend();
 }
 
 void phase_sweep()
