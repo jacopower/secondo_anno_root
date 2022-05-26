@@ -40,31 +40,47 @@ void setStyle()
   gStyle->SetOptFit(111111);
 }
 
-void setGraphicsGraph(TGraphErrors *name)
+void setGraphicsGraph(TGraphErrors *graph)
 {
   // *****  ASSE X *****
-  name->SetMarkerStyle(kPlus);
-  name->SetMarkerColor(kAzure);
-  name->SetFillColor(0);
+  TAxis *asseX = graph->GetXaxis();
 
-  name->GetXaxis()->SetAxisColor(kRed);
-  name->GetXaxis()->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+  graph->SetMarkerStyle(kPlus);
+  graph->SetMarkerColor(kAzure);
+  graph->SetFillColor(0);
 
-  name->GetXaxis()->SetTitleOffset(1.2);
-  name->GetXaxis()->SetTitleSize(0.03);
+  asseX->SetTitleOffset(1.2);
+  asseX->SetTitleSize(0.03);
+  asseX->SetTitleColor(kBlue);
 
-  name->GetXaxis()->SetLabelColor(kGreen);
-  name->GetXaxis()->SetLabelFont(1);
-  name->GetXaxis()->SetLabelSize(0.03);
-  name->GetXaxis()->SetLabelOffset(0.01);
+  asseX->SetAxisColor(kRed);
+  asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+  // asseX->SetNoExponent(); no exp su assi
 
-  name->GetXaxis()->SetNdivisions(1010); // 10 divsioni secondarie, 10 divisioni primarie
-  name->GetXaxis()->SetTickSize(0.01);
-  //name->GetXaxis()->SetTickLength(0.05);
+  asseX->SetLabelColor(kGreen);
+  asseX->SetLabelFont(1);
+  asseX->SetLabelSize(0.03);
+  asseX->SetLabelOffset(0.01);
+
+  asseX->SetNdivisions(1030); // 10 divsioni secondarie, 30 divisioni primarie
+  asseX->SetTickSize(0.01);
+  // name->GetXaxis()->SetTickLength(0.05);
 
   // ***** ASSE Y *****
+  TAxis *asseY = graph->GetYaxis();
+}
 
-  // *****  *****
+void setGraphicsFit(TF1 *func)
+{
+  func->SetLineWidth(2);
+  func->SetLineColor(kRed);
+}
+
+void setGraphicsCanvas(TCanvas *c)
+{
+  c->SetWindowSize(width + (width - c->GetWw()), height + (height - c->GetWh()));
+  c->SetGridx();
+  c->SetGridy();
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -560,7 +576,6 @@ void amplitude_sweep()
   // ***** LEGGO DATI INPUT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
-  graphResistenza->GetXaxis()->SetTitleColor(kRed);
   setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
@@ -579,8 +594,8 @@ void amplitude_sweep()
   TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
-  funcResistenza->SetLineWidth(2);
-  funcResistenza->SetLineColor(kRed);
+  setGraphicsFit(funcResistenza);
+
   TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
   TMatrixD covResistenza = rResistenza->GetCovarianceMatrix();
   std::cout << '\n'
@@ -595,16 +610,16 @@ void amplitude_sweep()
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R_tot", "L", "C_mis");
-  funcInduttanza->SetLineWidth(2);
-  funcInduttanza->SetLineColor(kRed);
+  setGraphicsFit(funcInduttanza);
+
   graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 2E3, 4E3, 3);
   funcCondensatore->SetParameters(R_tot, L_mis, C_mis);
   funcCondensatore->SetParNames("R_tot", "L", "C_mis");
-  funcCondensatore->SetLineWidth(2);
-  funcCondensatore->SetLineColor(kRed);
+  setGraphicsFit(funcCondensatore);
+
   TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
   TMatrixD covCondensatore = rCondensatore->GetCovarianceMatrix();
   std::cout << '\n'
@@ -619,8 +634,8 @@ void amplitude_sweep()
   TF1 *funcTotale = new TF1("funcTotale", amp_freq_totale, 2E3, 6E3, 3);
   funcTotale->SetParameters(R_tot, L_mis, C_mis);
   funcTotale->SetParNames("Rtot", "L", "C");
-  funcTotale->SetLineWidth(2);
-  funcTotale->SetLineColor(kRed);
+  setGraphicsFit(funcTotale);
+
   TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
   TMatrixD covTotale = rTotale->GetCovarianceMatrix();
   std::cout << '\n'
@@ -659,9 +674,11 @@ void amplitude_sweep()
 
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
+  setGraphicsCanvas(cResistenza);
+  graphResistenza->Draw("APE"); // ALP
 
   // TCanvas *cResistenza = new TCanvas();
-  graphResistenza->Draw("APE"); // ALP
+
   // gPad->SetLogx();
   // TCanvas *cInduttanza = new TCanvas();
   // graphInduttanza->Draw("APE"); // ALP
