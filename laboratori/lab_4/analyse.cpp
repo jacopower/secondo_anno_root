@@ -15,6 +15,9 @@
 #include "TFitResultPtr.h"
 #include "TMatrixD.h"
 #include "TLine.h"
+#include "TPaveText.h"
+#include "TPaveStats.h"
+#include "TLatex.h"
 
 // VEDI QUESTI PARAMETRI
 constexpr Double_t V0_mis = 5;
@@ -36,10 +39,10 @@ void setStyle()
   gROOT->SetStyle("Modern");
   //  VEDI TUTTE LE OPZIONI DI FONT
   // gStyle->SetStatFont()
-  //gStyle->SetPalette(57); // NON CAPISCO CHE FA
+  // gStyle->SetPalette(57); // NON CAPISCO CHE FA
   gStyle->SetOptTitle(1);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-   gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -90,6 +93,24 @@ void setGraphicsCanvas(TCanvas *c)
   c->SetFrameFillColor(21);
   c->SetFrameLineColor(kRed);
   c->SetFrameLineWidth(12);
+}
+
+TPaveText *setBoxParameters(TCanvas *c)
+{
+  TPaveText *boxParametri = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
+  boxParametri->AddText("A TPaveText can contain severals line of text.");
+  boxParametri->AddText("They are added to the pave using the AddText method.");
+  boxParametri->AddLine(.0, .5, 1., .5);
+  boxParametri->AddText("Even complex TLatex formulas can be added:");
+  TText *t1 = boxParametri->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
+  t1->SetTextColor(kBlue);
+  TText *t2 = boxParametri->GetLineWith("Even");
+  t2->SetTextColor(kOrange + 1);
+  return boxParametri;
+}
+
+TPaveText *setTitleCanvas(TCanvas *c)
+{
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -684,8 +705,19 @@ void amplitude_sweep()
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
+  // cResistenza->SetLogx();
   graphResistenza->Draw("APE"); // L=polyline C=SmoothCurve
-                                // cResistenza->SetLogx();
+  TPaveText *boxResistenza = setBoxParameters(cResistenza);
+  boxResistenza->Draw();
+
+  // TPaveText *pt = new TPaveText(1., 1., .7, .7, "NDC, NB"); //NDC=CoordinateRelative NB=noBorders
+  // pt->AddText("A TPaveText can contain severals line of text.");
+  // pt->AddText("They are added to the pave using the AddText method.");
+  // pt->AddLine(.0, .5, 1., .5);
+  // pt->AddText("Even complex TLatex formulas can be added:");
+  // TText *t1 = pt->AddText("F(t) = #sum_{i=-#infty}^{#infty}A(i)cos#[]{#frac{i}{t+i}}");
+  // t1->SetTextColor(kBlue);
+  // pt->Draw();
 
   // TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
   // setGraphicsCanvas(cInduttanza);
