@@ -127,3 +127,10 @@ void canvas()
   }
   gBenchmark->Show("canvas");
 }
+
+//****************************************
+// Change the axis limits
+   gPad->Modified();
+   mg->GetXaxis()->SetLimits(1.5,7.5);
+   mg->SetMinimum(0.);
+   mg->SetMaximum(10.);

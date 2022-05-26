@@ -39,10 +39,10 @@ void setStyle()
   gROOT->SetStyle("Modern");
   //  VEDI TUTTE LE OPZIONI DI FONT
   // gStyle->SetStatFont()
-  // gStyle->SetPalette(57); // NON CAPISCO CHE FA
-  gStyle->SetOptTitle(1);
+  gStyle->SetPalette(57); // NON CAPISCO CHE FA
+  gStyle->SetOptTitle(0);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -50,6 +50,7 @@ void setGraphicsGraph(TGraphErrors *graph)
   // ***** GRAFICO *****
   graph->SetMarkerStyle(kFullCircle);
   graph->SetMarkerColor(kAzure - 1);
+  graph->SetLineColor(kAzure - 1);
   // graph->SetMarkerSize(8);
   // graph->SetFillColor(0);
 
@@ -675,11 +676,11 @@ void amplitude_sweep()
             << "Da Condensatore: " << fRisCondensatore << '\n'
             << "Da Totale: " << fRisTotale << '\n';
 
-  // ***** PLOTTO GRAFICI *****
-  TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
-  setGraphicsCanvas(cResistenza);
-  // cResistenza->SetLogx();
-  graphResistenza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+  // ***** PLOTTO RESISTENZA *****
+  // TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
+  // setGraphicsCanvas(cResistenza);
+  //// cResistenza->SetLogx();
+  // graphResistenza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
   // TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders
   // boxResistenza->AddText("A TPaveText can contain severals line of text.");
@@ -692,28 +693,44 @@ void amplitude_sweep()
   // t2->SetTextColor(kOrange + 1);
   // boxResistenza->Draw();
 
-  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
-  setGraphicsCanvas(cInduttanza);
-  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+  // ***** PLOTTO INDUTTANZA *****
+  // TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
+  // setGraphicsCanvas(cInduttanza);
+  // graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
-  setGraphicsCanvas(cCondensatore);
-  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+  // ***** PLOTTO CONDENSATORE *****
+  // TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
+  // setGraphicsCanvas(cCondensatore);
+  // graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
-  setGraphicsCanvas(cTotale);
-  graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+  // ***** PLOTTO TOTALE *****
+  // TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
+  // setGraphicsCanvas(cTotale);
+  // graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  // TCanvas *multiCanvas = new TCanvas();
-  // multiCanvas->cd();
-  // setGraphicsCanvas(multiCanvas);
-  // TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  // multiGraph->Add(graphResistenza);
-  // multiGraph->Add(graphInduttanza);
-  // multiGraph->Add(graphCondensatore);
-  // multiGraph->Add(graphTotale);
-  // multiGraph->Draw("ALP"); // COSA FA LP?
-  // multiCanvas->BuildLegend();
+  // ***** MULTI PLOT *****
+  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Ampiezza", width, height);
+  setGraphicsCanvas(multiCanvas);
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+
+  multiGraph->Add(graphResistenza);
+  graphResistenza->SetLineColor(kPink + 1);
+  graphResistenza->SetMarkerColor(kPink + 1);
+
+  multiGraph->Add(graphInduttanza);
+  graphInduttanza->SetLineColor(kOrange + 1);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+
+  multiGraph->Add(graphCondensatore);
+  graphCondensatore->SetLineColor(kSpring - 6);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+
+  multiGraph->Add(graphTotale);
+  graphTotale->SetLineColor(kAzure - 1);
+  graphTotale->SetMarkerColor(kAzure - 1);
+
+  multiGraph->Draw("ALP");
+  multiCanvas->BuildLegend();
 }
 
 void phase_sweep()
