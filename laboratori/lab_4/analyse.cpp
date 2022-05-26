@@ -33,13 +33,13 @@ constexpr Double_t height = 720;
 
 void setStyle()
 {
-  // gROOT->SetStyle("Default");
+  gROOT->SetStyle("Modern");
   //  VEDI TUTTE LE OPZIONI DI FONT
   // gStyle->SetStatFont()
-  // gStyle->SetPalette(57); // NON CAPISCO CHE FA
-  // gStyle->SetOptTitle(0);
+  //gStyle->SetPalette(57); // NON CAPISCO CHE FA
+  gStyle->SetOptTitle(1);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  // gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
+   gStyle->SetOptFit(1111); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
