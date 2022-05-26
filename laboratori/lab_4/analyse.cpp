@@ -33,11 +33,13 @@ constexpr Double_t height = 720;
 
 void setStyle()
 {
-  gROOT->SetStyle("Plain");
-  gStyle->SetPalette(57);
-  gStyle->SetOptTitle(1);
-  gStyle->SetOptStat(112210);
-  gStyle->SetOptFit(111111);
+  // gROOT->SetStyle("Default");
+  //  VEDI TUTTE LE OPZIONI DI FONT
+  // gStyle->SetStatFont()
+  // gStyle->SetPalette(57); // NON CAPISCO CHE FA
+  // gStyle->SetOptTitle(0);
+  // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
+  // gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -47,6 +49,7 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   graph->SetMarkerStyle(kPlus);
   graph->SetMarkerColor(kAzure);
+  graph->SetMarkerSize(3);
   graph->SetFillColor(0);
 
   asseX->SetTitleOffset(1.2);
@@ -68,11 +71,13 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   // ***** ASSE Y *****
   TAxis *asseY = graph->GetYaxis();
+  // asseY->SetLimits(0, 5);
 }
 
 void setGraphicsFit(TF1 *func)
 {
-  func->SetLineWidth(2);
+  func->SetLineStyle(2);
+  func->SetLineWidth(8);
   func->SetLineColor(kRed);
 }
 
@@ -81,6 +86,10 @@ void setGraphicsCanvas(TCanvas *c)
   c->SetWindowSize(width + (width - c->GetWw()), height + (height - c->GetWh()));
   c->SetGridx();
   c->SetGridy();
+
+  c->SetFrameFillColor(21);
+  c->SetFrameLineColor(kRed);
+  c->SetFrameLineWidth(12);
 }
 
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
@@ -675,28 +684,32 @@ void amplitude_sweep()
   // ***** PLOTTO GRAFICI *****
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
-  graphResistenza->Draw("APE"); // ALP
+  graphResistenza->Draw("APE"); // L=polyline C=SmoothCurve
+                                // cResistenza->SetLogx();
 
-  // TCanvas *cResistenza = new TCanvas();
+  // TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
+  // setGraphicsCanvas(cInduttanza);
+  // graphInduttanza->Draw("APE"); // L=polyline C=SmoothCurve
 
-  // gPad->SetLogx();
-  // TCanvas *cInduttanza = new TCanvas();
-  // graphInduttanza->Draw("APE"); // ALP
-  // TCanvas *cCondensatore = new TCanvas();
-  // graphCondensatore->Draw("APE"); // ALP
-  // TCanvas *cTotale = new TCanvas();
-  // graphTotale->Draw("APE");
+  // TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
+  // setGraphicsCanvas(cCondensatore);
+  // graphCondensatore->Draw("APE"); // L=polyline C=SmoothCurve
+
+  // TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
+  // setGraphicsCanvas(cTotale);
+  // graphTotale->Draw("APE"); // L=polyline C=SmoothCurve
+
   /*
-    TCanvas *multiCanvas = new TCanvas();
-    multiCanvas->cd();
-    TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-    multiGraph->Add(graphResistenza);
-    multiGraph->Add(graphInduttanza);
-    multiGraph->Add(graphCondensatore);
-    multiGraph->Add(graphTotale);
-    multiGraph->Draw("ALP"); // COSA FA LP?
-    multiCanvas->BuildLegend();
-    */
+      TCanvas *multiCanvas = new TCanvas();
+      multiCanvas->cd();
+      TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
+      multiGraph->Add(graphResistenza);
+      multiGraph->Add(graphInduttanza);
+      multiGraph->Add(graphCondensatore);
+      multiGraph->Add(graphTotale);
+      multiGraph->Draw("ALP"); // COSA FA LP?
+      multiCanvas->BuildLegend();
+      */
 }
 
 void phase_sweep()
