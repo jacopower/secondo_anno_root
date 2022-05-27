@@ -41,7 +41,7 @@ void setStyle()
   //   VEDI TUTTE LE OPZIONI DI FONT
   //  gStyle->SetStatFont()
   gStyle->SetPalette(57); // NON CAPISCO CHE FA
-  gStyle->SetOptTitle(1);
+  gStyle->SetOptTitle(0);
   // gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
   gStyle->SetOptFit(0); // 1=Prob 1=Chi 1=Err 1=Param
 }
@@ -725,16 +725,22 @@ void amplitude_sweep()
   // ***** PLOTTO RESISTENZA *****
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
-  // cResistenza->SetLogx();
+  cResistenza->SetLogx();
   graphResistenza->Draw("ALP");
+
+  TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
+  titoloResistenza->SetMargin(0);
+  titoloResistenza->SetTextFont(2);
+  titoloResistenza->SetShadowColor(kRed);
+  titoloResistenza->SetBorderSize(2);
+  titoloResistenza->SetFillColor(kWhite);
+  titoloResistenza->SetTextAlign(22);
+  titoloResistenza->AddText("Sweep Ampiezza Resistenza");
+  titoloResistenza->Draw();
 
   TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
   boxResistenza->SetBorderSize(1);
-  // boxResistenza->SetMargin(0.03);
-  // boxResistenza->SetFillColor(kMagenta -10);
-  // boxResistenza->SetTextColor(kRed);
   boxResistenza->SetTextAlign(12);
-
   boxResistenza->AddText("Parametri Fit:");
   boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
   boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
@@ -745,15 +751,69 @@ void amplitude_sweep()
   setGraphicsCanvas(cInduttanza);
   graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
+  TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
+  titoloInduttanza->SetMargin(0);
+  titoloInduttanza->SetTextFont(2);
+  titoloInduttanza->SetShadowColor(kRed);
+  titoloInduttanza->SetBorderSize(2);
+  titoloInduttanza->SetFillColor(kWhite);
+  titoloInduttanza->SetTextAlign(22);
+  titoloInduttanza->AddText("Sweep Ampiezza Resistenza");
+  titoloInduttanza->Draw();
+
+  TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  boxInduttanza->SetBorderSize(1);
+  boxInduttanza->SetTextAlign(12);
+  boxInduttanza->AddText("Parametri Fit:");
+  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+  boxInduttanza->Draw();
+
   // ***** PLOTTO CONDENSATORE *****
   TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
   setGraphicsCanvas(cCondensatore);
   graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
+  TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
+  titoloCondensatore->SetMargin(0);
+  titoloCondensatore->SetTextFont(2);
+  titoloCondensatore->SetShadowColor(kRed);
+  titoloCondensatore->SetBorderSize(2);
+  titoloCondensatore->SetFillColor(kWhite);
+  titoloCondensatore->SetTextAlign(22);
+  titoloCondensatore->AddText("Sweep Ampiezza Resistenza");
+  titoloCondensatore->Draw();
+
+  TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  boxCondensatore->SetBorderSize(1);
+  boxCondensatore->SetTextAlign(12);
+  boxCondensatore->AddText("Parametri Fit:");
+  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+  boxCondensatore->Draw();
+
   //***** PLOTTO TOTALE *****
   TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
   setGraphicsCanvas(cTotale);
   graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+
+  TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
+  titoloTotale->SetMargin(0);
+  titoloTotale->SetTextFont(2);
+  titoloTotale->SetShadowColor(kRed);
+  titoloTotale->SetBorderSize(2);
+  titoloTotale->SetFillColor(kWhite);
+  titoloTotale->SetTextAlign(22);
+  titoloTotale->AddText("Sweep Ampiezza Resistenza");
+  titoloTotale->Draw();
+
+  TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  boxTotale->SetBorderSize(1);
+  boxTotale->SetTextAlign(12);
+  boxTotale->AddText("Parametri Fit:");
+  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+  boxTotale->Draw();
 
   // ***** MULTI PLOT *****
   TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Ampiezza", width, height);
@@ -779,6 +839,25 @@ void amplitude_sweep()
 
   multiGraph->Draw("ALP");
   setMultiPlot(multiGraph);
+
+  TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
+  titoloMulti->SetMargin(0);
+  titoloMulti->SetTextFont(2);
+  titoloMulti->SetShadowColor(kRed);
+  titoloMulti->SetBorderSize(2);
+  titoloMulti->SetFillColor(kWhite);
+  titoloMulti->SetTextAlign(22);
+  titoloMulti->AddText("Sweep Ampiezza Resistenza");
+  titoloMulti->Draw();
+
+  TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  boxMulti->SetBorderSize(1);
+  boxMulti->SetTextAlign(12);
+  boxMulti->AddText("Parametri Fit:");
+  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+  boxMulti->Draw();
+
   multiCanvas->BuildLegend();
 }
 
