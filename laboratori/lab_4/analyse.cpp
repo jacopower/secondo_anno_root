@@ -736,14 +736,10 @@ void amplitude_sweep()
 
   // ***** FREQUENZA RISONANZA *****
   Double_t fRisResistenza = funcResistenza->GetMaximumX(3E3, 4E3);
-  Double_t fRisInduttanza = funcInduttanza->GetMaximumX(3E3, 4E3);
-  Double_t fRisCondensatore = funcCondensatore->GetMaximumX(3E3, 4E3);
   Double_t fRisTotale = funcTotale->GetMinimumX(3E3, 4E3);
 
   std::cout << "***** CALCOLO FREQUENZA RISONANZA *****" << '\n'
             << "Da Resistenza: " << fRisResistenza << '\n'
-            << "Da Induttanza: " << fRisInduttanza << '\n'
-            << "Da Condensatore: " << fRisCondensatore << '\n'
             << "Da Totale: " << fRisTotale << '\n';
 
   // ***** PLOTTO RESISTENZA *****
@@ -977,35 +973,72 @@ void phase_sweep()
 
 void phase_offset()
 {
+  //////////////////////////////////////////////
+  //                                          //
+  //   !!!!! NOTA BENE - MODIFICATO !!!!!     //
+  //                                          //
+  // multiGraph->GetYaxis()->SetLabelFont(2); //
+  //                                          //
+  //////////////////////////////////////////////
+
+  setStyle();
+
+  constexpr Double_t maxMultiPlot = 2.;
+
   // ***** LEGGO DATI INPUT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase_traslato/resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
-  graphResistenza->SetMarkerStyle(kPlus);
-  graphResistenza->SetMarkerColor(kAzure);
-  graphResistenza->SetFillColor(0);
+  setGraphicsGraph(graphResistenza);
+  graphResistenza->SetMarkerColor(kPink + 1);
+  graphResistenza->SetLineColor(kPink + 1);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase_traslato/induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
-  graphInduttanza->SetMarkerStyle(kPlus);
-  graphInduttanza->SetMarkerColor(kRed);
-  graphInduttanza->SetFillColor(0);
+  setGraphicsGraph(graphInduttanza);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+  graphInduttanza->SetLineColor(kOrange + 1);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase_traslato/condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
-  graphCondensatore->SetMarkerStyle(kPlus);
-  graphCondensatore->SetMarkerColor(kGreen);
-  graphCondensatore->SetFillColor(0);
-
-  // TLine *line1 = new TLine(500, 0, 500, 1);
+  setGraphicsGraph(graphCondensatore);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+  graphCondensatore->SetLineColor(kSpring - 6);
 
   // ***** MULTIPLOT *****
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Risultati finali");
+  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Fase - Offset", width, height);
+  setGraphicsCanvas(multiCanvas);
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Offset");
+  multiGraph->SetTitle("Sweep Fase - Multiplot; Frequency (Hz); Amplitude (V)");
+
   multiGraph->Add(graphResistenza);
+  graphResistenza->SetLineColor(kPink + 1);
+  graphResistenza->SetMarkerColor(kPink + 1);
+
   multiGraph->Add(graphInduttanza);
+  graphInduttanza->SetLineColor(kOrange + 1);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+
   multiGraph->Add(graphCondensatore);
+  graphCondensatore->SetLineColor(kSpring - 6);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+
+  multiGraph->SetMaximum(maxMultiPlot);
   multiGraph->Draw("ALP");
+  setMultiPlot(multiGraph);
+  multiGraph->GetYaxis()->SetLabelFont(2);
+
+  TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloMulti);
+  titoloMulti->AddText("Sweep Fase - Offset");
+  titoloMulti->Draw();
+
+  TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxMulti);
+  boxMulti->AddText("Parametri Fit:");
+  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+  boxMulti->Draw();
+
   multiCanvas->BuildLegend();
 }
 
