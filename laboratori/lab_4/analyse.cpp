@@ -1126,7 +1126,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
 
   // ***** PLOTTO RESISTENZA *****
-  TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
+  TCanvas *cResistenza = new TCanvas("cResistenza", "Amplitude Time Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
   graphResistenza->SetMaximum(maxPlotResistenza);
   graphResistenza->GetYaxis()->SetLabelFont(2);
@@ -1134,7 +1134,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
   TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloResistenza);
-  titoloResistenza->AddText("Sweep Ampiezza - Resistenza");
+  titoloResistenza->AddText("Ampiezza Tempo - Resistenza");
   titoloResistenza->Draw();
 
   TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1145,7 +1145,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   boxResistenza->Draw();
 
   // ***** PLOTTO INDUTTANZA *****
-  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
+  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Amplitude Time Induttanza", width, height);
   setGraphicsCanvas(cInduttanza);
   graphInduttanza->SetMaximum(maxPlotInduttanza);
   graphInduttanza->GetYaxis()->SetLabelFont(2);
@@ -1153,7 +1153,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
   TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloInduttanza);
-  titoloInduttanza->AddText("Sweep Ampiezza - Induttanza");
+  titoloInduttanza->AddText("Ampiezza Tempo - Induttanza");
   titoloInduttanza->Draw();
 
   TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1164,7 +1164,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   boxInduttanza->Draw();
 
   // ***** PLOTTO CONDENSATORE *****
-  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
+  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Amplitude Time Condensatore", width, height);
   setGraphicsCanvas(cCondensatore);
   graphCondensatore->SetMaximum(maxPlotCondensatore);
   graphCondensatore->GetYaxis()->SetLabelFont(2);
@@ -1172,7 +1172,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
   TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloCondensatore);
-  titoloCondensatore->AddText("Sweep Ampiezza - Condensatore");
+  titoloCondensatore->AddText("Ampiezza Tempo - Condensatore");
   titoloCondensatore->Draw();
 
   TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1183,7 +1183,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   boxCondensatore->Draw();
 
   //***** PLOTTO TOTALE *****
-  TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
+  TCanvas *cTotale = new TCanvas("cTotale", "Amplitude Time Totale", width, height);
   setGraphicsCanvas(cTotale);
   graphTotale->SetMaximum(maxPlotTotale);
   graphTotale->GetYaxis()->SetLabelFont(2);
@@ -1191,7 +1191,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
   TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloTotale);
-  titoloTotale->AddText("Sweep Ampiezza - Totale");
+  titoloTotale->AddText("Ampiezza Tempo - Totale");
   titoloTotale->Draw();
 
   TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1202,10 +1202,10 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   boxTotale->Draw();
 
   // ***** MULTI PLOT *****
-  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Ampiezza", width, height);
+  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Amplitude Time", width, height);
   setGraphicsCanvas(multiCanvas);
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  multiGraph->SetTitle("Sweep Ampiezza - Multiplot; Frequency (Hz); Amplitude (V)");
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Time - Risultati finali");
+  multiGraph->SetTitle("Amplitude Time - Multiplot; Frequency (Hz); Amplitude (V)");
 
   multiGraph->Add(graphResistenza);
   graphResistenza->SetLineColor(kPink + 1);
@@ -1230,7 +1230,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
   TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloMulti);
-  titoloMulti->AddText("Sweep Ampiezza - Multiplot");
+  titoloMulti->AddText("Ampiezza Tempo - Multiplot");
   titoloMulti->Draw();
 
   TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1245,6 +1245,7 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
 
 void amplitude2_time_in_risonanza() // FREQUENZA = 3.5301 KHz
 {
+  gStyle->SetOptFit(1111);
   constexpr Double_t f_mis = 3530.1;
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/resistenza.txt", "%lg %lg %lg");
