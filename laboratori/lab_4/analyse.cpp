@@ -870,71 +870,48 @@ void phase_sweep()
   //    VEDI PERCHE? E' COSI'                                        //
   //                                                                 //
   ////////////////////////////////////////////////////////////////////
+  setStyle();
 
+  constexpr Double_t maxMultiPlot = 4.;
   // ***** LEGGO DATI INPUT *****
-  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg %lg");
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
-  graphResistenza->SetMarkerStyle(kPlus);
-  graphResistenza->SetMarkerColor(kAzure);
-  graphResistenza->SetFillColor(0);
+  setGraphicsGraph(graphResistenza);
+  graphResistenza->SetMarkerColor(kPink + 1);
+  graphResistenza->SetLineColor(kPink + 1);
 
-  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg %lg");
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg");
   graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
-  graphInduttanza->SetMarkerStyle(kPlus);
-  graphInduttanza->SetMarkerColor(kAzure);
-  graphInduttanza->SetFillColor(0);
+  setGraphicsGraph(graphInduttanza);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+  graphInduttanza->SetLineColor(kOrange + 1);
 
-  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg %lg");
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg");
   graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
-  graphCondensatore->SetMarkerStyle(kPlus);
-  graphCondensatore->SetMarkerColor(kAzure);
-  graphCondensatore->SetFillColor(0);
-
-  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_fase/sweep_phase_totale.txt", "%lg %lg %lg %lg");
-  graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Phase (RAD)");
-  graphTotale->SetMarkerStyle(kPlus);
-  graphTotale->SetMarkerColor(kAzure);
-  graphTotale->SetFillColor(0);
+  setGraphicsGraph(graphCondensatore);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+  graphCondensatore->SetLineColor(kSpring - 6);
 
   // ***** FIT SU RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 1E3, 6E3, 3); // LIMITI
+  TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 500, 5.5E3, 3); // LIMITI
   funcResistenza->SetParameters(R_tot, L_mis, C_tot);
   funcResistenza->SetParNames("R", "L", "C");
-  funcResistenza->SetLineWidth(2);
-  funcResistenza->SetLineColor(kRed);
+  setGraphicsFit(funcResistenza);
   TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
-  TMatrixD covResistenza = rResistenza->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT RESISTENZA *****" << '\n';
-  Double_t ChiResistenza = funcResistenza->GetChisquare();
-  Double_t NdofResistenza = funcResistenza->GetNDF();
-  std::cout << "ChiSquare: " << ChiResistenza << '\n'
-            << "NDF: " << NdofResistenza << '\n';
-  covResistenza.Print();
 
   // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 500, 5E3, 3); // LIMITI
+  TF1 *funcInduttanza = new TF1("funcInduttanza", phase_freq_induttanza, 500, 5.5E3, 3); // LIMITI
   funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
   funcInduttanza->SetParNames("R", "L", "C");
-  funcInduttanza->SetLineWidth(2);
-  funcInduttanza->SetLineColor(kRed);
-  graphInduttanza->Fit(funcInduttanza, "REMSQ");
+  setGraphicsFit(funcInduttanza);
+  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
   // ***** FIT SU CONDENSATORE *****
   TF1 *funcCondensatore = new TF1("funcResistenza", phase_freq_condensatore, 500, 5.5E3, 3); // LIMITI
   funcCondensatore->SetParameters(R_tot, L_mis, C_tot);
   funcCondensatore->SetParNames("R", "L", "C");
-  funcCondensatore->SetLineWidth(2);
-  funcCondensatore->SetLineColor(kRed);
+  setGraphicsFit(funcCondensatore);
   TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
-  TMatrixD covCondensatore = rCondensatore->GetCovarianceMatrix();
-  std::cout << '\n'
-            << "***** MATRICE COVARIANZA FIT CONDENSATORE *****" << '\n';
-  Double_t ChiCondensatore = funcCondensatore->GetChisquare();
-  Double_t NdofCondensatore = funcCondensatore->GetNDF();
-  std::cout << "ChiSquare: " << ChiCondensatore << '\n'
-            << "NDF: " << NdofCondensatore << '\n';
-  covCondensatore.Print();
 
   // ***** CALCOLO RISONANZA *****
   Double_t fRisResistenza = funcResistenza->GetX(0., 3E3, 4E3);
@@ -950,65 +927,11 @@ void phase_sweep()
             << "Da Induttanza: " << fRisInduttanza << '\n'
             << "Da Condensatore: " << fRisCondensatore << '\n';
 
-  // ***** PLOTTO GRAFICI *****
-  TCanvas *cResistenza = new TCanvas();
-  graphResistenza->Draw("APE"); // ALP
-  TCanvas *cInduttanza = new TCanvas();
-  graphInduttanza->Draw("APE"); // ALP
-  TCanvas *cCondensatore = new TCanvas();
-  graphCondensatore->Draw("APE"); // ALP
-  // TCanvas *cTotale = new TCanvas();
-  // graphTotale->Draw("APE");
-
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Risultati finali");
-  multiGraph->Add(graphResistenza);
-  multiGraph->Add(graphInduttanza);
-  multiGraph->Add(graphCondensatore);
-  multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA FA LP?
-  multiCanvas->BuildLegend();
-}
-
-void phase_offset()
-{
-  //////////////////////////////////////////////
-  //                                          //
-  //   !!!!! NOTA BENE - MODIFICATO !!!!!     //
-  //                                          //
-  // multiGraph->GetYaxis()->SetLabelFont(2); //
-  //                                          //
-  //////////////////////////////////////////////
-
-  setStyle();
-
-  constexpr Double_t maxMultiPlot = 2.;
-
-  // ***** LEGGO DATI INPUT *****
-  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase_traslato/resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
-  setGraphicsGraph(graphResistenza);
-  graphResistenza->SetMarkerColor(kPink + 1);
-  graphResistenza->SetLineColor(kPink + 1);
-
-  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase_traslato/induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
-  setGraphicsGraph(graphInduttanza);
-  graphInduttanza->SetMarkerColor(kOrange + 1);
-  graphInduttanza->SetLineColor(kOrange + 1);
-
-  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase_traslato/condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
-  setGraphicsGraph(graphCondensatore);
-  graphCondensatore->SetMarkerColor(kSpring - 6);
-  graphCondensatore->SetLineColor(kSpring - 6);
-
   // ***** MULTIPLOT *****
   TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Fase - Offset", width, height);
   setGraphicsCanvas(multiCanvas);
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Offset");
-  multiGraph->SetTitle("Sweep Fase - Multiplot; Frequency (Hz); Amplitude (V)");
+  multiGraph->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
 
   multiGraph->Add(graphResistenza);
   graphResistenza->SetLineColor(kPink + 1);
@@ -1026,10 +949,12 @@ void phase_offset()
   multiGraph->Draw("ALP");
   setMultiPlot(multiGraph);
   multiGraph->GetYaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLimits(0, 6E3);
 
   TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloMulti);
-  titoloMulti->AddText("Sweep Fase - Offset");
+  titoloMulti->AddText("Fasi tensione misurate");
   titoloMulti->Draw();
 
   TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -1038,6 +963,80 @@ void phase_offset()
   boxMulti->AddText("R = (150 +/- 0.3) Ohm");
   boxMulti->AddText("R = (150 +/- 0.3) Ohm");
   boxMulti->Draw();
+
+  multiCanvas->BuildLegend();
+}
+
+void phase_offset()
+{
+  //////////////////////////////////////////////
+  //                                          //
+  //   !!!!! NOTA BENE - MODIFICATO !!!!!     //
+  //                                          //
+  // multiGraph->GetXaxis()->SetLabelFont(2); //
+  // multiGraph->GetYaxis()->SetLabelFont(2); //
+  //                                          //
+  //////////////////////////////////////////////
+
+  setStyle();
+
+  constexpr Double_t maxMultiPlot = 2.;
+
+  // ***** LEGGO DATI INPUT *****
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase_traslato/resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Fase resistenza; Frequency (Hz); Phase (RAD)");
+  setGraphicsGraph(graphResistenza);
+  graphResistenza->SetMarkerColor(kPink + 1);
+  graphResistenza->SetLineColor(kPink + 1);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase_traslato/induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Fase induttanza; Frequency (Hz); Phase (RAD)");
+  setGraphicsGraph(graphInduttanza);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+  graphInduttanza->SetLineColor(kOrange + 1);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase_traslato/condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Fase condensatore; Frequency (Hz); Phase (RAD)");
+  setGraphicsGraph(graphCondensatore);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+  graphCondensatore->SetLineColor(kSpring - 6);
+
+  // ***** MULTIPLOT *****
+  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Fase - Offset", width, height);
+  setGraphicsCanvas(multiCanvas);
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Offset");
+  multiGraph->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
+
+  multiGraph->Add(graphResistenza);
+  graphResistenza->SetLineColor(kPink + 1);
+  graphResistenza->SetMarkerColor(kPink + 1);
+
+  multiGraph->Add(graphInduttanza);
+  graphInduttanza->SetLineColor(kOrange + 1);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+
+  multiGraph->Add(graphCondensatore);
+  graphCondensatore->SetLineColor(kSpring - 6);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+
+  multiGraph->SetMaximum(maxMultiPlot);
+  multiGraph->Draw("ALP");
+  setMultiPlot(multiGraph);
+  multiGraph->GetYaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLabelFont(2);
+
+  TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloMulti);
+  titoloMulti->AddText("Fasi tensione sovrapposte");
+  titoloMulti->Draw();
+  /*
+    TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxMulti);
+    boxMulti->AddText("Parametri Fit:");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->Draw();
+  */
 
   multiCanvas->BuildLegend();
 }
@@ -1071,141 +1070,65 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   constexpr Double_t f_mis = 2E3;
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
+  graphResistenza->SetTitle("Tensione resistenza; time (s); Amplitude (V)");
   setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
+  graphInduttanza->SetTitle("Tensione induttanza; time (s); Amplitude (V)");
   setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
+  graphCondensatore->SetTitle("Tensione condensatore; time (s); Amplitude (V)");
   setGraphicsGraph(graphCondensatore);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/sotto_risonanza/totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
+  graphTotale->SetTitle("Tensione generatore; time (s); Amplitude (V)");
   setGraphicsGraph(graphTotale);
+  /*
+    // ***** FIT SU RESISTENZA *****
+    TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00479, 6);
+    funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcResistenza->SetNpx(10000);
+    funcResistenza->FixParameter(3, 2E3);
+    funcResistenza->FixParameter(4, 5.0);
+    setGraphicsFit(funcResistenza);
+    TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
 
-  // ***** FIT SU RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00479, 6);
-  funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcResistenza->SetNpx(10000);
-  funcResistenza->FixParameter(3, 2E3);
-  funcResistenza->FixParameter(4, 5.0);
-  setGraphicsFit(funcResistenza);
-  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+    // ***** FIT SU INDUTTANZA *****
+    TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.00479, 6);
+    funcInduttanza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcInduttanza->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcInduttanza->SetNpx(10000);
+    funcInduttanza->FixParameter(3, 2E3);
+    funcInduttanza->FixParameter(4, 5.0);
+    setGraphicsFit(funcInduttanza);
+    TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
-  // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.00479, 6);
-  funcInduttanza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcInduttanza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcInduttanza->SetNpx(10000);
-  funcInduttanza->FixParameter(3, 2E3);
-  funcInduttanza->FixParameter(4, 5.0);
-  setGraphicsFit(funcInduttanza);
-  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
+    // ***** FIT SU CONDENSATORE *****
+    TF1 *funcCondensatore = new TF1("funcCondensatore", amp_time_condensatore, 0, 0.00479, 6);
+    funcCondensatore->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcCondensatore->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcCondensatore->SetNpx(10000);
+    funcCondensatore->FixParameter(3, 2E3);
+    funcCondensatore->FixParameter(4, 5.0);
+    setGraphicsFit(funcCondensatore);
+    TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
 
-  // ***** FIT SU CONDENSATORE *****
-  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_time_condensatore, 0, 0.00479, 6);
-  funcCondensatore->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcCondensatore->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcCondensatore->SetNpx(10000);
-  funcCondensatore->FixParameter(3, 2E3);
-  funcCondensatore->FixParameter(4, 5.0);
-  setGraphicsFit(funcCondensatore);
-  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
-
-  // ***** FIT SU TOTALE *****
-  TF1 *funcTotale = new TF1("funcTotale", amp_time_totale, 0, 0.00479, 4);
-  funcTotale->SetParameters(R_mis, L_mis, C_mis, f_mis);
-  funcTotale->SetParNames("R", "L", "C", "f");
-  funcTotale->SetNpx(10000);
-  funcTotale->FixParameter(3, 2E3);
-  setGraphicsFit(funcTotale);
-  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
-
-  // ***** PLOTTO RESISTENZA *****
-  TCanvas *cResistenza = new TCanvas("cResistenza", "Amplitude Time Resistenza", width, height);
-  setGraphicsCanvas(cResistenza);
-  graphResistenza->SetMaximum(maxPlotResistenza);
-  graphResistenza->GetYaxis()->SetLabelFont(2);
-  graphResistenza->Draw("ALP");
-
-  TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloResistenza);
-  titoloResistenza->AddText("Ampiezza Tempo - Resistenza");
-  titoloResistenza->Draw();
-
-  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxResistenza);
-  boxResistenza->AddText("Parametri Fit:");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
-  boxResistenza->Draw();
-
-  // ***** PLOTTO INDUTTANZA *****
-  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Amplitude Time Induttanza", width, height);
-  setGraphicsCanvas(cInduttanza);
-  graphInduttanza->SetMaximum(maxPlotInduttanza);
-  graphInduttanza->GetYaxis()->SetLabelFont(2);
-  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
-
-  TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloInduttanza);
-  titoloInduttanza->AddText("Ampiezza Tempo - Induttanza");
-  titoloInduttanza->Draw();
-
-  TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxInduttanza);
-  boxInduttanza->AddText("Parametri Fit:");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->Draw();
-
-  // ***** PLOTTO CONDENSATORE *****
-  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Amplitude Time Condensatore", width, height);
-  setGraphicsCanvas(cCondensatore);
-  graphCondensatore->SetMaximum(maxPlotCondensatore);
-  graphCondensatore->GetYaxis()->SetLabelFont(2);
-  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
-
-  TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloCondensatore);
-  titoloCondensatore->AddText("Ampiezza Tempo - Condensatore");
-  titoloCondensatore->Draw();
-
-  TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxCondensatore);
-  boxCondensatore->AddText("Parametri Fit:");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->Draw();
-
-  //***** PLOTTO TOTALE *****
-  TCanvas *cTotale = new TCanvas("cTotale", "Amplitude Time Totale", width, height);
-  setGraphicsCanvas(cTotale);
-  graphTotale->SetMaximum(maxPlotTotale);
-  graphTotale->GetYaxis()->SetLabelFont(2);
-  graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
-
-  TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloTotale);
-  titoloTotale->AddText("Ampiezza Tempo - Totale");
-  titoloTotale->Draw();
-
-  TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxTotale);
-  boxTotale->AddText("Parametri Fit:");
-  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
-  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
-  boxTotale->Draw();
-
+    // ***** FIT SU TOTALE *****
+    TF1 *funcTotale = new TF1("funcTotale", amp_time_totale, 0, 0.00479, 4);
+    funcTotale->SetParameters(R_mis, L_mis, C_mis, f_mis);
+    funcTotale->SetParNames("R", "L", "C", "f");
+    funcTotale->SetNpx(10000);
+    funcTotale->FixParameter(3, 2E3);
+    setGraphicsFit(funcTotale);
+    TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
+  */
   // ***** MULTI PLOT *****
   TCanvas *multiCanvas = new TCanvas("multiCanvas", "Amplitude Time", width, height);
   setGraphicsCanvas(multiCanvas);
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Time - Risultati finali");
-  multiGraph->SetTitle("Amplitude Time - Multiplot; Frequency (Hz); Amplitude (V)");
+  multiGraph->SetTitle("Amplitude Time - Multiplot; Tempo (s); Tensione (V)");
 
   multiGraph->Add(graphResistenza);
   graphResistenza->SetLineColor(kPink + 1);
@@ -1227,20 +1150,96 @@ void amplitude1_time_sotto_risonanza() // FREQUENZA = 2 KHz
   multiGraph->Draw("ALP");
   setMultiPlot(multiGraph);
   multiGraph->GetYaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLimits(0., 0.0025);
 
   TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloMulti);
-  titoloMulti->AddText("Ampiezza Tempo - Multiplot");
+  titoloMulti->AddText("Tensione in funzione del tempo - sotto risonanza");
   titoloMulti->Draw();
-
-  TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxMulti);
-  boxMulti->AddText("Parametri Fit:");
-  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
-  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
-  boxMulti->Draw();
-
+  /*
+    TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxMulti);
+    boxMulti->AddText("Parametri Fit:");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->Draw();
+  */
   multiCanvas->BuildLegend();
+
+  /*
+  TCanvas *cResistenza = new TCanvas("cResistenza", "Amplitude Time Resistenza", width, height);
+  setGraphicsCanvas(cResistenza);
+  graphResistenza->SetMaximum(maxPlotResistenza);
+  graphResistenza->GetYaxis()->SetLabelFont(2);
+  graphResistenza->Draw("ALP");
+
+  TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloResistenza);
+  titoloResistenza->AddText("Ampiezza Tempo - Resistenza");
+  titoloResistenza->Draw();
+
+  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxResistenza);
+  boxResistenza->AddText("Parametri Fit:");
+  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
+  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
+  boxResistenza->Draw();
+
+  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Amplitude Time Induttanza", width, height);
+  setGraphicsCanvas(cInduttanza);
+  graphInduttanza->SetMaximum(maxPlotInduttanza);
+  graphInduttanza->GetYaxis()->SetLabelFont(2);
+  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+
+  TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloInduttanza);
+  titoloInduttanza->AddText("Ampiezza Tempo - Induttanza");
+  titoloInduttanza->Draw();
+
+  TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxInduttanza);
+  boxInduttanza->AddText("Parametri Fit:");
+  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+  boxInduttanza->Draw();
+
+  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Amplitude Time Condensatore", width, height);
+  setGraphicsCanvas(cCondensatore);
+  graphCondensatore->SetMaximum(maxPlotCondensatore);
+  graphCondensatore->GetYaxis()->SetLabelFont(2);
+  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+
+  TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloCondensatore);
+  titoloCondensatore->AddText("Ampiezza Tempo - Condensatore");
+  titoloCondensatore->Draw();
+
+  TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxCondensatore);
+  boxCondensatore->AddText("Parametri Fit:");
+  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+  boxCondensatore->Draw();
+
+  TCanvas *cTotale = new TCanvas("cTotale", "Amplitude Time Totale", width, height);
+  setGraphicsCanvas(cTotale);
+  graphTotale->SetMaximum(maxPlotTotale);
+  graphTotale->GetYaxis()->SetLabelFont(2);
+  graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+
+  TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloTotale);
+  titoloTotale->AddText("Ampiezza Tempo - Totale");
+  titoloTotale->Draw();
+
+  TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxTotale);
+  boxTotale->AddText("Parametri Fit:");
+  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+  boxTotale->Draw();
+*/
 }
 
 void amplitude2_time_in_risonanza() // FREQUENZA = 3.5301 KHz
@@ -1272,140 +1271,141 @@ void amplitude2_time_in_risonanza() // FREQUENZA = 3.5301 KHz
   constexpr Double_t f_mis = 3530.1;
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/resistenza.txt", "%lg %lg %lg");
- setGraphicsGraph(graphResistenza);
+  graphResistenza->SetTitle("Tensione resistenza; time (s); Amplitude (V)");
+  setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/in_risonanza/induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
+  graphInduttanza->SetTitle("Tensione induttanza; time (s); Amplitude (V)");
   setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/in_risonanza/condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
+  graphCondensatore->SetTitle("Tensione condensatore; time (s); Amplitude (V)");
   setGraphicsGraph(graphCondensatore);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/in_risonanza/totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
+  graphTotale->SetTitle("Tensione generatore; time (s); Amplitude (V)");
   setGraphicsGraph(graphTotale);
+  /*
+    // ***** FIT SU RESISTENZA *****
+    TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00279, 6);
+    funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcResistenza->SetNpx(10000);
+    funcResistenza->FixParameter(3, 3530.1);
+    funcResistenza->FixParameter(4, 5.0);
+    setGraphicsFit(funcResistenza);
+    TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
 
-  // ***** FIT SU RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00279, 6);
-  funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcResistenza->SetNpx(10000);
-  funcResistenza->FixParameter(3, 3530.1);
-  funcResistenza->FixParameter(4, 5.0);
-  setGraphicsFit(funcResistenza);
-  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+    // ***** FIT SU INDUTTANZA *****
+    TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.00279, 6);
+    funcInduttanza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcInduttanza->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcInduttanza->SetNpx(10000);
+    funcInduttanza->FixParameter(3, 3530.1);
+    funcInduttanza->FixParameter(4, 5.0);
+    setGraphicsFit(funcInduttanza);
+    TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
 
-  // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.00279, 6);
-  funcInduttanza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcInduttanza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcInduttanza->SetNpx(10000);
-  funcInduttanza->FixParameter(3, 3530.1);
-  funcInduttanza->FixParameter(4, 5.0);
-  setGraphicsFit(funcInduttanza);
-  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
+    // ***** FIT SU CONDENSATORE *****
+    TF1 *funcCondensatore = new TF1("funcCondensatore", amp_time_condensatore, 0, 0.00279, 6);
+    funcCondensatore->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
+    funcCondensatore->SetParNames("R", "L", "C", "f", "V", "Offset");
+    funcCondensatore->SetNpx(10000);
+    funcCondensatore->FixParameter(3, 3530.1);
+    funcCondensatore->FixParameter(4, 5.0);
+    setGraphicsFit(funcCondensatore);
+    TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
 
-  // ***** FIT SU CONDENSATORE *****
-  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_time_condensatore, 0, 0.00279, 6);
-  funcCondensatore->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcCondensatore->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcCondensatore->SetNpx(10000);
-  funcCondensatore->FixParameter(3, 3530.1);
-  funcCondensatore->FixParameter(4, 5.0);
-  setGraphicsFit(funcCondensatore);
-  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
+    // ***** FIT SU TOTALE *****
+    TF1 *funcTotale = new TF1("funcTotale", amp_time_totale, 0, 0.00279, 4);
+    funcTotale->SetParameters(R_mis, L_mis, C_mis, f_mis);
+    funcTotale->SetParNames("R", "L", "C", "f");
+    funcTotale->SetNpx(10000);
+    funcTotale->FixParameter(3, 3530.1);
+    setGraphicsFit(funcTotale);
+    TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
 
-  // ***** FIT SU TOTALE *****
-  TF1 *funcTotale = new TF1("funcTotale", amp_time_totale, 0, 0.00279, 4);
-  funcTotale->SetParameters(R_mis, L_mis, C_mis, f_mis);
-  funcTotale->SetParNames("R", "L", "C", "f");
-  funcTotale->SetNpx(10000);
-  funcTotale->FixParameter(3, 3530.1);
-  setGraphicsFit(funcTotale);
-  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
+    // ***** PLOTTO RESISTENZA *****
+    TCanvas *cResistenza = new TCanvas("cResistenza", "Amplitude Time Resistenza", width, height);
+    setGraphicsCanvas(cResistenza);
+    graphResistenza->SetMaximum(maxPlotResistenza);
+    graphResistenza->GetYaxis()->SetLabelFont(2);
+    graphResistenza->Draw("ALP");
 
-  // ***** PLOTTO RESISTENZA *****
-  TCanvas *cResistenza = new TCanvas("cResistenza", "Amplitude Time Resistenza", width, height);
-  setGraphicsCanvas(cResistenza);
-  graphResistenza->SetMaximum(maxPlotResistenza);
-  graphResistenza->GetYaxis()->SetLabelFont(2);
-  graphResistenza->Draw("ALP");
+    TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloResistenza);
+    titoloResistenza->AddText("Ampiezza Tempo in Risonanza - Resistenza");
+    titoloResistenza->Draw();
 
-  TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloResistenza);
-  titoloResistenza->AddText("Ampiezza Tempo in Risonanza - Resistenza");
-  titoloResistenza->Draw();
+    TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxResistenza);
+    boxResistenza->AddText("Parametri Fit:");
+    boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
+    boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
+    boxResistenza->Draw();
 
-  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxResistenza);
-  boxResistenza->AddText("Parametri Fit:");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
-  boxResistenza->Draw();
+    // ***** PLOTTO INDUTTANZA *****
+    TCanvas *cInduttanza = new TCanvas("cInduttanza", "Amplitude Time Induttanza", width, height);
+    setGraphicsCanvas(cInduttanza);
+    graphInduttanza->SetMaximum(maxPlotInduttanza);
+    graphInduttanza->GetYaxis()->SetLabelFont(2);
+    graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-// ***** PLOTTO INDUTTANZA *****
-  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Amplitude Time Induttanza", width, height);
-  setGraphicsCanvas(cInduttanza);
-  graphInduttanza->SetMaximum(maxPlotInduttanza);
-  graphInduttanza->GetYaxis()->SetLabelFont(2);
-  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+    TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloInduttanza);
+    titoloInduttanza->AddText("Ampiezza Tempo in Risonanza - Induttanza");
+    titoloInduttanza->Draw();
 
-  TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloInduttanza);
-  titoloInduttanza->AddText("Ampiezza Tempo in Risonanza - Induttanza");
-  titoloInduttanza->Draw();
+    TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxInduttanza);
+    boxInduttanza->AddText("Parametri Fit:");
+    boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+    boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+    boxInduttanza->Draw();
 
-  TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxInduttanza);
-  boxInduttanza->AddText("Parametri Fit:");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->Draw();
+    // ***** PLOTTO CONDENSATORE *****
+    TCanvas *cCondensatore = new TCanvas("cCondensatore", "Amplitude Time Condensatore", width, height);
+    setGraphicsCanvas(cCondensatore);
+    graphCondensatore->SetMaximum(maxPlotCondensatore);
+    graphCondensatore->GetYaxis()->SetLabelFont(2);
+    graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-// ***** PLOTTO CONDENSATORE *****
-  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Amplitude Time Condensatore", width, height);
-  setGraphicsCanvas(cCondensatore);
-  graphCondensatore->SetMaximum(maxPlotCondensatore);
-  graphCondensatore->GetYaxis()->SetLabelFont(2);
-  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+    TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloCondensatore);
+    titoloCondensatore->AddText("Ampiezza Tempo in Risonanza - Condensatore");
+    titoloCondensatore->Draw();
 
-  TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloCondensatore);
-  titoloCondensatore->AddText("Ampiezza Tempo in Risonanza - Condensatore");
-  titoloCondensatore->Draw();
+    TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxCondensatore);
+    boxCondensatore->AddText("Parametri Fit:");
+    boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+    boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+    boxCondensatore->Draw();
 
-  TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxCondensatore);
-  boxCondensatore->AddText("Parametri Fit:");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->Draw();
+    // ***** PLOTTO TOTALE *****
+    TCanvas *cTotale = new TCanvas("cTotale", "Amplitude Time Totale", width, height);
+    setGraphicsCanvas(cTotale);
+    graphTotale->SetMaximum(maxPlotTotale);
+    graphTotale->GetYaxis()->SetLabelFont(2);
+    graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  //***** PLOTTO TOTALE *****
-  TCanvas *cTotale = new TCanvas("cTotale", "Amplitude Time Totale", width, height);
-  setGraphicsCanvas(cTotale);
-  graphTotale->SetMaximum(maxPlotTotale);
-  graphTotale->GetYaxis()->SetLabelFont(2);
-  graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+    TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloTotale);
+    titoloTotale->AddText("Ampiezza Tempo in Risonanza - Totale");
+    titoloTotale->Draw();
 
-  TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloTotale);
-  titoloTotale->AddText("Ampiezza Tempo in Risonanza - Totale");
-  titoloTotale->Draw();
-
-  TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxTotale);
-  boxTotale->AddText("Parametri Fit:");
-  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
-  boxTotale->AddText("R = (150 +/- 0.3) Ohm");
-  boxTotale->Draw();
-
-// ***** MULTI PLOT *****
+    TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxTotale);
+    boxTotale->AddText("Parametri Fit:");
+    boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+    boxTotale->AddText("R = (150 +/- 0.3) Ohm");
+    boxTotale->Draw();
+  */
+  // ***** MULTI PLOT *****
   TCanvas *multiCanvas = new TCanvas("multiCanvas", "Amplitude Time", width, height);
   setGraphicsCanvas(multiCanvas);
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Time - Risultati finali");
-  multiGraph->SetTitle("Amplitude Time - Multiplot; Frequency (Hz); Amplitude (V)");
+  multiGraph->SetTitle("Amplitude Time - Multiplot; Tempo (s); Tensione (V)");
 
   multiGraph->Add(graphResistenza);
   graphResistenza->SetLineColor(kPink + 1);
@@ -1427,110 +1427,94 @@ void amplitude2_time_in_risonanza() // FREQUENZA = 3.5301 KHz
   multiGraph->Draw("ALP");
   setMultiPlot(multiGraph);
   multiGraph->GetYaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLimits(0., 0.0015);
 
   TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloMulti);
-  titoloMulti->AddText("Ampiezza Tempo in Risonanza - Multiplot");
+  titoloMulti->AddText("Tensione in funzione del tempo - in risonanza");
   titoloMulti->Draw();
-
-  TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxMulti);
-  boxMulti->AddText("Parametri Fit:");
-  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
-  boxMulti->AddText("R = (150 +/- 0.3) Ohm");
-  boxMulti->Draw();
+  /*
+    TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxMulti);
+    boxMulti->AddText("Parametri Fit:");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->AddText("R = (150 +/- 0.3) Ohm");
+    boxMulti->Draw();
+  */
 
   multiCanvas->BuildLegend();
 }
 
 void amplitude3_time_sopra_risonanza() // FREQUENZA 10kHz
 {
+    //////////////////////////////////////////////////////
+  //                                                  //
+  //   !!!!! NOTA BENE - MODIFICATO !!!!!             //
+  //                                                  //
+  //  graphResistenza->GetYaxis()->SetLabelFont(2);   //
+  //  graphInduttanza->GetYaxis()->SetLabelFont(2);   //
+  //  graphCondensatore->GetYaxis()->SetLabelFont(2); //
+  //  graphTotale->GetYaxis()->SetLabelFont(2);       //
+  //  multiGraph->GetYaxis()->SetLabelFont(2);        //
+  //                                                  //
+  //////////////////////////////////////////////////////
+
+  setStyle();
+
+  // ***** COSTANTI *****
+  constexpr Double_t maxMultiPlot = 7;
   constexpr Double_t f_mis = 10000;
 
   TGraphErrors *graphResistenza = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Ampiezza Resistenza; time (s); Amplitude (V)");
-  graphResistenza->SetMarkerStyle(kPlus);
-  graphResistenza->SetMarkerColor(kAzure);
-  graphResistenza->SetFillColor(0);
+  graphResistenza->SetTitle("Tensione resistenza; time (s); Amplitude (V)");
+  setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Ampiezza Induttanza; time (s); Amplitude (V)");
-  graphInduttanza->SetMarkerStyle(kPlus);
-  graphInduttanza->SetMarkerColor(kAzure);
-  graphInduttanza->SetFillColor(0);
+  graphInduttanza->SetTitle("Tensione induttanza; time (s); Amplitude (V)");
+  setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Ampiezza Condensatore; time (s); Amplitude (V)");
-  graphCondensatore->SetMarkerStyle(kPlus);
-  graphCondensatore->SetMarkerColor(kAzure);
-  graphCondensatore->SetFillColor(0);
+  graphCondensatore->SetTitle("Tensione condensatore; time (s); Amplitude (V)");
+  setGraphicsGraph(graphCondensatore);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/ampiezza_tempo/sopra_risonanza/totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Ampiezza Totale; time (s); Amplitude (V)");
-  graphTotale->SetMarkerStyle(kPlus);
-  graphTotale->SetMarkerColor(kAzure);
-  graphTotale->SetFillColor(0);
+  graphTotale->SetTitle("Tensione generatore; time (s); Amplitude (V)");
+  setGraphicsGraph(graphTotale);
 
-  // ***** FIT SU RESISTENZA *****
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00119, 6);
-  funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcResistenza->SetNpx(10000);
-  funcResistenza->FixParameter(3, 10000);
-  funcResistenza->FixParameter(4, 5.0);
-  funcResistenza->SetLineWidth(2);
-  funcResistenza->SetLineColor(kRed);
-  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+  // ***** MULTI PLOT *****
+  TCanvas *multiCanvas = new TCanvas("multiCanvas", "Amplitude Time", width, height);
+  setGraphicsCanvas(multiCanvas);
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Time - Risultati finali");
+  multiGraph->SetTitle("Amplitude Time - Multiplot; Tempo (s); Tensione (V)");
 
-  // ***** FIT SU INDUTTANZA *****
-  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_time_induttanza, 0, 0.00119, 6);
-  funcInduttanza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcInduttanza->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcInduttanza->SetNpx(10000);
-  funcInduttanza->FixParameter(3, 10000);
-  funcInduttanza->FixParameter(4, 5.0);
-  funcInduttanza->SetLineWidth(2);
-  funcInduttanza->SetLineColor(kRed);
-  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
-
-  // ***** FIT SU CONDENSATORE *****
-  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_time_condensatore, 0, 0.00119, 6);
-  funcCondensatore->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcCondensatore->SetParNames("R", "L", "C", "f", "V", "Offset");
-  funcCondensatore->SetNpx(10000);
-  funcCondensatore->FixParameter(3, 10000);
-  funcCondensatore->FixParameter(4, 5.0);
-  funcCondensatore->SetLineWidth(2);
-  funcCondensatore->SetLineColor(kRed);
-  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
-
-  // ***** FIT SU TOTALE *****
-  TF1 *funcTotale = new TF1("funcTotale", amp_time_totale, 0, 0.00119, 4);
-  funcTotale->SetParameters(R_mis, L_mis, C_mis, f_mis);
-  funcTotale->SetParNames("R", "L", "C", "f");
-  funcTotale->SetNpx(10000);
-  funcTotale->FixParameter(3, 10000);
-  funcTotale->SetLineWidth(2);
-  funcTotale->SetLineColor(kRed);
-  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
-
-  //***** PLOTTO I GRAFICI *****
-  TCanvas *cResistenza = new TCanvas();
-  graphResistenza->Draw("APE");
-  TCanvas *cInduttanza = new TCanvas();
-  graphInduttanza->Draw("APE");
-  TCanvas *cCondensatore = new TCanvas();
-  graphCondensatore->Draw("APE");
-  TCanvas *cTotale = new TCanvas();
-  graphTotale->Draw("APE");
-
-  TCanvas *multiCanvas = new TCanvas();
-  multiCanvas->cd();
-  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Ampiezze e Tempo - Risultati finali");
   multiGraph->Add(graphResistenza);
+  graphResistenza->SetLineColor(kPink + 1);
+  graphResistenza->SetMarkerColor(kPink + 1);
+
   multiGraph->Add(graphInduttanza);
+  graphInduttanza->SetLineColor(kOrange + 1);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+
   multiGraph->Add(graphCondensatore);
+  graphCondensatore->SetLineColor(kSpring - 6);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+
   multiGraph->Add(graphTotale);
-  multiGraph->Draw("ALP"); // COSA FA LP?
+  graphTotale->SetLineColor(kAzure - 1);
+  graphTotale->SetMarkerColor(kAzure - 1);
+
+  multiGraph->SetMaximum(maxMultiPlot);
+  multiGraph->Draw("ALP");
+  setMultiPlot(multiGraph);
+  multiGraph->GetYaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLabelFont(2);
+  multiGraph->GetXaxis()->SetLimits(0., 0.0005);
+
+  TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
+  setGraphicsTitolo(titoloMulti);
+  titoloMulti->AddText("Tensione in funzione del tempo - sopra risonanza");
+  titoloMulti->Draw();
+
   multiCanvas->BuildLegend();
 }
