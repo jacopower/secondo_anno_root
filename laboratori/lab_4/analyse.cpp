@@ -31,7 +31,7 @@ constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t C_tot = 177 * 1E-9;
 constexpr Double_t C_agg = C_tot - C_mis;
 
-constexpr Double_t width = 1280;
+constexpr Double_t width = 1080;
 constexpr Double_t height = 720;
 
 void setStyle()
@@ -43,7 +43,7 @@ void setStyle()
   gStyle->SetPalette(57); // NON CAPISCO CHE FA
   gStyle->SetOptTitle(0);
   gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  gStyle->SetOptFit(0);       // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptFit(1111);       // 1=Prob 1=Chi 1=Err 1=Param
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -697,7 +697,7 @@ void amplitude_sweep()
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
   setGraphicsFit(funcResistenza);
-  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+  //TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
 
   // ***** FIT SU INDUTTANZA *****
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
@@ -727,7 +727,7 @@ void amplitude_sweep()
   Double_t f_centro = funcResistenza->GetMaximumX(3E3, 4E3);
   Double_t Q_resistenza = f_centro / (f_max - f_min);
 
-  std::cout << "***** CALCOLO FATTORE DI QUALITA' *****" << '\n'
+  std::cout << "***** CALCOLO FATTORE DI QUALITA' OLD *****" << '\n'
             << "Massimo: " << maxResistenza << '\n'
             << "F MIN: " << f_min << '\n'
             << "F MAX: " << f_max << '\n'
@@ -738,14 +738,25 @@ void amplitude_sweep()
   Double_t fRisResistenza = funcResistenza->GetMaximumX(3E3, 4E3);
   Double_t fRisTotale = funcTotale->GetMinimumX(3E3, 4E3);
 
-  std::cout << "***** CALCOLO FREQUENZA RISONANZA *****" << '\n'
+  std::cout << "***** CALCOLO FREQUENZA RISONANZA OLD *****" << '\n'
             << "Da Resistenza: " << fRisResistenza << '\n'
             << "Da Totale: " << fRisTotale << '\n';
+
+  // ***** FREQUENZA RISONANZA RESISTENZA - FIT PARABOLICO *****
+  TF1 *parabolaResistenza = new TF1("parabolaResistenza", "[0] * x * x - 2 *[0] *[1] * x + [2]", 3000, 4200);
+  parabolaResistenza->SetParNames("a", "k", "c");
+  setGraphicsFit(parabolaResistenza);
+  graphResistenza->Fit(parabolaResistenza, "REMSQ");
+  TCanvas *cParabolaResistenza = new TCanvas("cParabolaResistenza", "Fit Parabolico Resistenza", width, height);
+  setGraphicsCanvas(cParabolaResistenza);
+  graphResistenza->Draw("ALP");
+
+  // ***** FREQUENZA RISONANZA GENERATORE - FIT PARABOLICO *****
 
   // ***** PLOTTO RESISTENZA *****
   TCanvas *cResistenza = new TCanvas("cResistenza", "Sweep Ampiezza Resistenza", width, height);
   setGraphicsCanvas(cResistenza);
-  cResistenza->SetLogx();
+  // cResistenza->SetLogx();
   graphResistenza->SetMaximum(maxPlotResistenza);
   graphResistenza->Draw("ALP");
 
@@ -756,47 +767,50 @@ void amplitude_sweep()
 
   TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
   setGraphicsBox(boxResistenza);
+  boxResistenza->SetFillColor(kWhite);
   boxResistenza->AddText("Parametri Fit:");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
-  boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
+  boxResistenza->AddText("Rtot = (230.6 +/- 3.8) Ohm");
+  boxResistenza->AddText("Rmis = (148.0 +/- 2.4) Ohm");
+  boxResistenza->AddText("L = (11.96 +/- 0.20) mH");
+  boxResistenza->AddText("C = (170.3 +/- 2.8) nF");
   boxResistenza->Draw();
-/*
-  // ***** PLOTTO INDUTTANZA *****
-  TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
-  setGraphicsCanvas(cInduttanza);
-  graphInduttanza->SetMaximum(maxPlotInduttanza);
-  graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+  /*
+    // ***** PLOTTO INDUTTANZA *****
+    TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
+    setGraphicsCanvas(cInduttanza);
+    graphInduttanza->SetMaximum(maxPlotInduttanza);
+    graphInduttanza->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloInduttanza);
-  titoloInduttanza->AddText("Sweep Ampiezza - Induttanza");
-  titoloInduttanza->Draw();
+    TPaveText *titoloInduttanza = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloInduttanza);
+    titoloInduttanza->AddText("Sweep Ampiezza - Induttanza");
+    titoloInduttanza->Draw();
 
-  TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxInduttanza);
-  boxInduttanza->AddText("Parametri Fit:");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
-  boxInduttanza->Draw();
+    TPaveText *boxInduttanza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxInduttanza);
+    boxInduttanza->AddText("Parametri Fit:");
+    boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+    boxInduttanza->AddText("R = (150 +/- 0.3) Ohm");
+    boxInduttanza->Draw();
 
-  // ***** PLOTTO CONDENSATORE *****
-  TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
-  setGraphicsCanvas(cCondensatore);
-  graphCondensatore->SetMaximum(maxPlotCondensatore);
-  graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
+    // ***** PLOTTO CONDENSATORE *****
+    TCanvas *cCondensatore = new TCanvas("cCondensatore", "Sweep Ampiezza Condensatore", width, height);
+    setGraphicsCanvas(cCondensatore);
+    graphCondensatore->SetMaximum(maxPlotCondensatore);
+    graphCondensatore->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
-  TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
-  setGraphicsTitolo(titoloCondensatore);
-  titoloCondensatore->AddText("Sweep Ampiezza - Condensatore");
-  titoloCondensatore->Draw();
+    TPaveText *titoloCondensatore = new TPaveText(0, 1., .3, .95, "NDC BL");
+    setGraphicsTitolo(titoloCondensatore);
+    titoloCondensatore->AddText("Sweep Ampiezza - Condensatore");
+    titoloCondensatore->Draw();
 
-  TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
-  setGraphicsBox(boxCondensatore);
-  boxCondensatore->AddText("Parametri Fit:");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
-  boxCondensatore->Draw();
-*/
+    TPaveText *boxCondensatore = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+    setGraphicsBox(boxCondensatore);
+    boxCondensatore->AddText("Parametri Fit:");
+    boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+    boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
+    boxCondensatore->Draw();
+  */
   //***** PLOTTO TOTALE *****
   TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
   setGraphicsCanvas(cTotale);
@@ -1450,7 +1464,7 @@ void amplitude2_time_in_risonanza() // FREQUENZA = 3.5301 KHz
 
 void amplitude3_time_sopra_risonanza() // FREQUENZA 10kHz
 {
-    //////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
   //                                                  //
   //   !!!!! NOTA BENE - MODIFICATO !!!!!             //
   //                                                  //
