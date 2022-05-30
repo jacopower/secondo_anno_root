@@ -672,24 +672,24 @@ void amplitude_sweep()
   constexpr Double_t maxPlotResistenza = 4.;
   constexpr Double_t maxPlotCondensatore = 7.5;
   constexpr Double_t maxPlotInduttanza = 7.5;
-  constexpr Double_t maxPlotTotale = 5.8;
+  constexpr Double_t maxPlotTotale = 5.4;
   constexpr Double_t maxMultiPlot = 7.5;
 
   // ***** LEGGO DATI INPUT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Amplitude (V)");
+  graphResistenza->SetTitle("Tensione resistenza; Frequenza (Hz); Tensione (V)");
   setGraphicsGraph(graphResistenza);
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Amplitude (V)");
+  graphInduttanza->SetTitle("Tensione induttanza; Frequenza (Hz); Tensione (V)");
   setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Amplitude (V)");
+  graphCondensatore->SetTitle("Tensione condensatore; Frequenza (Hz); Tensione (V)");
   setGraphicsGraph(graphCondensatore);
 
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
-  graphTotale->SetTitle("Sweep Totale; Frequency (Hz); Amplitude (V)");
+  graphTotale->SetTitle("Tensione generatore; Frequenza (Hz); Tensione (V)");
   setGraphicsGraph(graphTotale);
 
   // ***** FIT SULLA RESISTENZA *****
@@ -751,7 +751,7 @@ void amplitude_sweep()
 
   TPaveText *titoloResistenza = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloResistenza);
-  titoloResistenza->AddText("Sweep Ampiezza - Resistenza");
+  titoloResistenza->AddText("Risposta in frequenza - resistenza");
   titoloResistenza->Draw();
 
   TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -760,7 +760,7 @@ void amplitude_sweep()
   boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
   boxResistenza->AddText("R = (150 +/- 0.3) Ohm");
   boxResistenza->Draw();
-
+/*
   // ***** PLOTTO INDUTTANZA *****
   TCanvas *cInduttanza = new TCanvas("cInduttanza", "Sweep Ampiezza Induttanza", width, height);
   setGraphicsCanvas(cInduttanza);
@@ -796,16 +796,17 @@ void amplitude_sweep()
   boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
   boxCondensatore->AddText("R = (150 +/- 0.3) Ohm");
   boxCondensatore->Draw();
-
+*/
   //***** PLOTTO TOTALE *****
   TCanvas *cTotale = new TCanvas("cTotale", "Sweep Ampiezza Totale", width, height);
   setGraphicsCanvas(cTotale);
   graphTotale->SetMaximum(maxPlotTotale);
+  graphTotale->GetXaxis()->SetLimits(0., 8000);
   graphTotale->Draw("ALP"); // L=polyline C=SmoothCurve E=ErrorBar
 
   TPaveText *titoloTotale = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloTotale);
-  titoloTotale->AddText("Sweep Ampiezza - Totale");
+  titoloTotale->AddText("Risposta in frequenza - generatore");
   titoloTotale->Draw();
 
   TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
@@ -819,7 +820,7 @@ void amplitude_sweep()
   TCanvas *multiCanvas = new TCanvas("multiCanvas", "Sweep in Ampiezza", width, height);
   setGraphicsCanvas(multiCanvas);
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep - Risultati finali");
-  multiGraph->SetTitle("Sweep Ampiezza - Multiplot; Frequency (Hz); Amplitude (V)");
+  multiGraph->SetTitle("Sweep Ampiezza - Multiplot; Frequenza (Hz); Tensione (V)");
 
   multiGraph->Add(graphResistenza);
   graphResistenza->SetLineColor(kPink + 1);
@@ -840,10 +841,11 @@ void amplitude_sweep()
   multiGraph->SetMaximum(maxMultiPlot);
   multiGraph->Draw("ALP");
   setMultiPlot(multiGraph);
+  multiGraph->GetXaxis()->SetLimits(0., 20500);
 
   TPaveText *titoloMulti = new TPaveText(0, 1., .3, .95, "NDC BL");
   setGraphicsTitolo(titoloMulti);
-  titoloMulti->AddText("Sweep Ampiezza - Multiplot");
+  titoloMulti->AddText("Risposta in frequenza - tutte le componenti");
   titoloMulti->Draw();
 
   TPaveText *boxMulti = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
