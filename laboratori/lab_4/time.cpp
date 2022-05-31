@@ -50,7 +50,7 @@ void setGraphicsGraph(TGraphErrors *graph)
   asseX->SetTitleSize(0.04);
   asseX->SetTitleFont(2);
 
-  asseX->SetLabelFont(1);
+  asseX->SetLabelFont(2);
   asseX->SetLabelSize(0.04);
   asseX->SetLabelOffset(0.01);
 
@@ -66,7 +66,7 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   asseY->SetTitleOffset(1.3);
   asseY->SetTitleSize(0.04);
-  asseY->SetTitleFont(1);
+  asseY->SetTitleFont(2);
 
   asseY->SetLabelFont(1);
   asseY->SetLabelSize(0.04);
@@ -199,7 +199,7 @@ void time()
 
   // *****MULTIPLOT SOTTO RISONANZA *****
   TMultiGraph *multiGraph_sotto = new TMultiGraph("multiGraph_sotto", "Amplitude Time");
-  multiGraph_sotto->SetTitle("Tensione tempo - sotto risonanza; Tempo (s); Tensione (V)");
+  multiGraph_sotto->SetTitle("Tensione tempo - sotto risonanza; Tempo (ms); Tensione (V)");
   multiGraph_sotto->Add(graphResistenza_sotto);
   graphResistenza_sotto->SetLineColor(kPink + 1);
   graphResistenza_sotto->SetMarkerColor(kPink + 1);
@@ -214,7 +214,7 @@ void time()
 
   // ***** MULTIPLOT IN RISONANZA *****
   TMultiGraph *multiGraph_in = new TMultiGraph("multiGraph_in", "Amplitude Time");
-  multiGraph_in->SetTitle("Tensione tempo - in risonanza; Tempo (s); Tensione (V)");
+  multiGraph_in->SetTitle("Tensione tempo - in risonanza; Tempo (ms); Tensione (V)");
   multiGraph_in->Add(graphResistenza_in);
   graphResistenza_in->SetLineColor(kPink + 1);
   graphResistenza_in->SetMarkerColor(kPink + 1);
@@ -229,7 +229,7 @@ void time()
 
   // ***** MULTIPLOT SOPRA RISONANZA *****
   TMultiGraph *multiGraph_sopra = new TMultiGraph("multiGraph_sopra", "Amplitude Time");
-  multiGraph_sopra->SetTitle("Tensione tempo - sopra risonanza; Tempo (s); Tensione (V)");
+  multiGraph_sopra->SetTitle("Tensione tempo - sopra risonanza; Tempo (ms); Tensione (V)");
   multiGraph_sopra->Add(graphResistenza_sopra);
   graphResistenza_sopra->SetLineColor(kPink + 1);
   graphResistenza_sopra->SetMarkerColor(kPink + 1);
@@ -244,7 +244,7 @@ void time()
 
   // ***** GRAFICO RESISTENZA CON FIT *****
   TGraphErrors *graphResistenza_fit = new TGraphErrors("data/ampiezza_tempo/resistenza_sotto_risonanza.txt", "%lg %lg %lg");
-  graphResistenza_fit->SetTitle("Tensione resistenza; time (s); Amplitude (V)");
+  graphResistenza_fit->SetTitle("Tensione resistenza; Tempo (ms); Tensione (V)");
   setGraphicsGraph(graphResistenza_fit);
 
   // ***** PLOTTO *****
@@ -330,6 +330,8 @@ void time()
   padFit->SetGridx();
   padFit->SetGridy();
   padFit->SetFrameLineWidth(2);
+  graphResistenza_fit->GetXaxis()->SetMaxDigits(3);
+  graphResistenza_fit->GetXaxis()->SetNoExponent(false);
   graphResistenza_fit->SetMaximum(3);
   graphResistenza_fit->SetMinimum(-2);
   graphResistenza_fit->Draw("ALP");
