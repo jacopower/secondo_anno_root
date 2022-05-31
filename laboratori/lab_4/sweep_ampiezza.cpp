@@ -40,6 +40,7 @@ void setStyle()
   gROOT->SetStyle("BELLE2");
   gStyle->SetOptTitle(0);
   gStyle->SetOptFit(0);
+  gStyle->SetLineScalePS(1);
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -47,46 +48,46 @@ void setGraphicsGraph(TGraphErrors *graph)
   graph->SetMarkerStyle(kFullCircle);
   graph->SetMarkerColor(kAzure - 1);
   graph->SetLineColor(kAzure - 1);
+  graph->SetMarkerSize(0.9);
 
   // *****  ASSE X *****
   TAxis *asseX = graph->GetXaxis();
-  asseX->SetTitleOffset(1.4);
-  asseX->SetTitleSize(0.03);
-  asseX->SetTitleFont(1);
-
+  asseX->CenterTitle();
   asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseX->SetNoExponent(); // no exp su assi
 
+  asseX->SetTitleOffset(1.1);
+  asseX->SetTitleSize(0.05);
+  asseX->SetTitleFont(1);
+
   asseX->SetLabelFont(1);
-  asseX->SetLabelSize(0.025);
+  asseX->SetLabelSize(0.04);
   asseX->SetLabelOffset(0.01);
 
-  asseX->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
-  // asseX->SetTickSize(0.03);
-  // asseX->SetTickLength(0.03);
+  asseX->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie
+  asseX->SetTickLength(0.03);
 
   // ***** ASSE Y *****
   TAxis *asseY = graph->GetYaxis();
-
-  asseY->SetTitleOffset(1.4);
-  asseY->SetTitleSize(0.03);
-  asseY->SetTitleFont(1);
-
+  asseY->CenterTitle();
   asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseY->SetNoExponent(); // no exp su assi
 
+  asseY->SetTitleOffset(1.2);
+  asseY->SetTitleSize(0.05);
+  asseY->SetTitleFont(1);
+
   asseY->SetLabelFont(1);
-  asseY->SetLabelSize(0.025);
+  asseY->SetLabelSize(0.04);
   asseY->SetLabelOffset(0.01);
 
-  asseY->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
-  // asseY->SetTickSize(0.03);
-  // asseY->SetTickLength(0.03);
+  asseY->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie
+  asseY->SetTickLength(0.03);
 }
 
 void setGraphicsFit(TF1 *func)
 {
-  func->SetLineWidth(2);
+  func->SetLineWidth(3);
   func->SetLineColor(kRed);
 }
 
@@ -172,7 +173,7 @@ void sweep_ampiezza()
   setGraphicsFit(funcTotale);
   TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
 
-  // ***** PLOT *****s
+  // ***** PLOT *****
   // Canvas
   TCanvas *canvas = new TCanvas("canvas", "Resistenza / Generatore -  Sweep ampiezza", 0, 0, width, height);
   canvas->SetWindowSize(width + (width - canvas->GetWw()), height + (height - canvas->GetWh()));
@@ -190,7 +191,9 @@ void sweep_ampiezza()
   padResistenza->SetGridx();
   padResistenza->SetGridy();
   padResistenza->SetFrameLineWidth(2);
-  // graphResistenza->SetMaximum(maxPlotResistenza);
+  graphResistenza->GetXaxis()->SetMoreLogLabels();
+  graphResistenza->SetMinimum(0);
+  graphResistenza->SetMaximum(3.5);
   graphResistenza->Draw("ALP");
 
   // pad Generatore
@@ -198,7 +201,8 @@ void sweep_ampiezza()
   padGeneratore->SetGridx();
   padGeneratore->SetGridy();
   padGeneratore->SetFrameLineWidth(2);
-  // graphTotale->SetMaximum(maxPlotTotale);
+  graphTotale->SetMinimum(3.8);
+  graphTotale->SetMaximum(5.2);
   graphTotale->Draw("ALP");
 
   canvas->Update();
