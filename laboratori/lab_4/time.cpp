@@ -24,13 +24,10 @@ constexpr Double_t height = 1440;
 void setStyle()
 {
   gROOT->SetStyle("BELLE2");
-  // gStyle->SetTextFont(4);
-  //   VEDI TUTTE LE OPZIONI DI FONT
-  //  gStyle->SetStatFont()
-  gStyle->SetPalette(57); // NON CAPISCO CHE FA
+  gStyle->SetPalette(57);
   gStyle->SetOptTitle(0);
-  gStyle->SetOptStat(112211); // 1=Integral 1=Overf 1=Underf 2=RMS 2=Mean 1=Entries 1=Name
-  gStyle->SetOptFit(1111);    // 1=Prob 1=Chi 1=Err 1=Param
+  gStyle->SetOptStat(0);
+  gStyle->SetOptFit(0);
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -282,7 +279,7 @@ void time()
   padSotto->SetGridx();
   padSotto->SetGridy();
   padSotto->SetFrameLineWidth(2);
-  multiGraph_sotto->SetMaximum(8.);
+  multiGraph_sotto->SetMaximum(10);
   multiGraph_sotto->SetMinimum(-7);
   multiGraph_sotto->Draw("ALP");
 
@@ -298,7 +295,7 @@ void time()
   padIn->SetGridx();
   padIn->SetGridy();
   padIn->SetFrameLineWidth(2);
-  multiGraph_in->SetMaximum(8);
+  multiGraph_in->SetMaximum(10);
   multiGraph_in->SetMinimum(-7);
   multiGraph_in->Draw("ALP");
 
@@ -314,7 +311,7 @@ void time()
   padSopra->SetGridx();
   padSopra->SetGridy();
   padSopra->SetFrameLineWidth(2);
-  multiGraph_sopra->SetMaximum(8);
+  multiGraph_sopra->SetMaximum(10);
   multiGraph_sopra->SetMinimum(-6);
   multiGraph_sopra->Draw("ALP");
 
@@ -332,9 +329,15 @@ void time()
   padFit->SetFrameLineWidth(2);
   graphResistenza_fit->GetXaxis()->SetMaxDigits(3);
   graphResistenza_fit->GetXaxis()->SetNoExponent(false);
-  graphResistenza_fit->SetMaximum(3);
+  graphResistenza_fit->SetMaximum(2.5);
   graphResistenza_fit->SetMinimum(-2);
+  graphResistenza_fit->GetXaxis()->SetLimits(0., 2.5E-3);
   graphResistenza_fit->Draw("ALP");
+
+  TPaveText *titoloFit = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titoloFit);
+  titoloFit->AddText("Tensione resistenza sotto risonanza");
+  titoloFit->Draw();
 
   canvas->Update();
 }
