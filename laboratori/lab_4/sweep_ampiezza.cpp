@@ -38,9 +38,7 @@ constexpr Double_t height = 480;
 void setStyle()
 {
   gROOT->SetStyle("BELLE2");
-  gStyle->SetPalette(57);
   gStyle->SetOptTitle(0);
-  gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
 }
 
@@ -49,22 +47,16 @@ void setGraphicsGraph(TGraphErrors *graph)
   graph->SetMarkerStyle(kFullCircle);
   graph->SetMarkerColor(kAzure - 1);
   graph->SetLineColor(kAzure - 1);
-  // graph->SetMarkerSize(8);
-  // graph->SetFillColor(0);
 
   // *****  ASSE X *****
   TAxis *asseX = graph->GetXaxis();
-
   asseX->SetTitleOffset(1.4);
   asseX->SetTitleSize(0.03);
-  // asseX->SetTitleColor(kBlue);
   asseX->SetTitleFont(1);
 
-  // asseX->SetAxisColor(kRed);
   asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseX->SetNoExponent(); // no exp su assi
 
-  // asseX->SetLabelColor(kGreen);
   asseX->SetLabelFont(1);
   asseX->SetLabelSize(0.025);
   asseX->SetLabelOffset(0.01);
@@ -78,59 +70,11 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   asseY->SetTitleOffset(1.4);
   asseY->SetTitleSize(0.03);
-  // asseY->SetTitleColor(kBlue);
   asseY->SetTitleFont(1);
 
-  // asseY->SetAxisColor(kRed);
   asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseY->SetNoExponent(); // no exp su assi
 
-  // asseY->SetLabelColor(kGreen);
-  asseY->SetLabelFont(1);
-  asseY->SetLabelSize(0.025);
-  asseY->SetLabelOffset(0.01);
-
-  asseY->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
-  // asseY->SetTickSize(0.03);
-  // asseY->SetTickLength(0.03);
-}
-
-void setMultiPlot(TMultiGraph *graph)
-{
-  // *****  ASSE X *****
-  TAxis *asseX = graph->GetXaxis();
-
-  asseX->SetTitleOffset(1.4);
-  asseX->SetTitleSize(0.03);
-  // asseX->SetTitleColor(kBlue);
-  asseX->SetTitleFont(1);
-
-  // asseX->SetAxisColor(kRed);
-  asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
-  asseX->SetNoExponent(); // no exp su assi
-
-  // asseX->SetLabelColor(kGreen);
-  asseX->SetLabelFont(1);
-  asseX->SetLabelSize(0.025);
-  asseX->SetLabelOffset(0.01);
-
-  asseX->SetNdivisions(1010); // 10 divsioni secondarie, 30 divisioni primarie
-  // asseX->SetTickSize(0.03);
-  // asseX->SetTickLength(0.03);
-
-  // ***** ASSE Y *****
-  TAxis *asseY = graph->GetYaxis();
-
-  asseY->SetTitleOffset(1.4);
-  asseY->SetTitleSize(0.03);
-  // asseY->SetTitleColor(kBlue);
-  asseY->SetTitleFont(1);
-
-  // asseY->SetAxisColor(kRed);
-  asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
-  asseY->SetNoExponent(); // no exp su assi
-
-  // asseY->SetLabelColor(kGreen);
   asseY->SetLabelFont(1);
   asseY->SetLabelSize(0.025);
   asseY->SetLabelOffset(0.01);
@@ -142,7 +86,6 @@ void setMultiPlot(TMultiGraph *graph)
 
 void setGraphicsFit(TF1 *func)
 {
-  // func->SetLineStyle(2);
   func->SetLineWidth(2);
   func->SetLineColor(kRed);
 }
@@ -205,6 +148,8 @@ Double_t amp_freq_totale(Double_t *x, Double_t *par)
 
 void sweep_ampiezza()
 {
+  setStyle();
+
   // ***** RESISTENZA *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Tensione resistenza; Frequenza (Hz); Tensione (V)");
@@ -227,21 +172,33 @@ void sweep_ampiezza()
   setGraphicsFit(funcTotale);
   TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
 
-  // ***** PLOT *****
+  // ***** PLOT *****s
+  // Canvas
   TCanvas *canvas = new TCanvas("canvas", "Resistenza / Generatore -  Sweep ampiezza", 0, 0, width, height);
-  canvas->SetFillColor(18);
+  canvas->SetWindowSize(width + (width - canvas->GetWw()), height + (height - canvas->GetWh()));
+  canvas->SetFillColor(kWhite);
 
-  TPad *padResistenza = new TPad("padResistenza", "Resistenza", 0., 0., 0.50, 1., kRed);
-
-  TPad *padGeneratore = new TPad("padGeneratore", "Generatore", 0.50, 0., 1., 1., kBlue);
-
+  // Creo le Pad
+  TPad *padResistenza = new TPad("padResistenza", "Resistenza", 0., 0., 0.50, 1., kWhite);
+  TPad *padGeneratore = new TPad("padGeneratore", "Generatore", 0.50, 0., 1., 1., kWhite);
   padResistenza->Draw();
   padGeneratore->Draw();
 
+  // pad Resistenza
   padResistenza->cd();
+  padResistenza->SetLogx();
+  padResistenza->SetGridx();
+  padResistenza->SetGridy();
+  padResistenza->SetFrameLineWidth(2);
+  // graphResistenza->SetMaximum(maxPlotResistenza);
   graphResistenza->Draw("ALP");
 
+  // pad Generatore
   padGeneratore->cd();
+  padGeneratore->SetGridx();
+  padGeneratore->SetGridy();
+  padGeneratore->SetFrameLineWidth(2);
+  // graphTotale->SetMaximum(maxPlotTotale);
   graphTotale->Draw("ALP");
 
   canvas->Update();
