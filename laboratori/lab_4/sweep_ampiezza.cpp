@@ -37,7 +37,9 @@ constexpr Double_t height = 480;
 
 void setStyle()
 {
-  gROOT->SetStyle("BELLE2");
+  gROOT->SetStyle("Modern"); // BELLE2!!!!!!!!
+  gStyle->SetPadLeftMargin(0.1); 
+  gStyle->SetPadRightMargin(0.05);
   gStyle->SetOptTitle(0);
   gStyle->SetOptFit(0);
   gStyle->SetLineScalePS(1);
@@ -56,9 +58,9 @@ void setGraphicsGraph(TGraphErrors *graph)
   asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseX->SetNoExponent(); // no exp su assi
 
-  asseX->SetTitleOffset(1.1);
-  asseX->SetTitleSize(0.05);
-  asseX->SetTitleFont(1);
+  asseX->SetTitleOffset(1.2);
+  asseX->SetTitleSize(0.04);
+  asseX->SetTitleFont(2);
 
   asseX->SetLabelFont(1);
   asseX->SetLabelSize(0.04);
@@ -72,9 +74,10 @@ void setGraphicsGraph(TGraphErrors *graph)
   asseY->CenterTitle();
   asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
   asseY->SetNoExponent(); // no exp su assi
+  asseY->SetDecimals();
 
-  asseY->SetTitleOffset(1.2);
-  asseY->SetTitleSize(0.05);
+  asseY->SetTitleOffset(1.3);
+  asseY->SetTitleSize(0.04);
   asseY->SetTitleFont(1);
 
   asseY->SetLabelFont(1);
@@ -114,6 +117,7 @@ void setGraphicsTitolo(TPaveText *titolo)
 
 void setGraphicsBox(TPaveText *box)
 {
+  box->SetFillColor(kWhite);
   box->SetBorderSize(1);
   box->SetTextAlign(12);
 }
@@ -175,7 +179,7 @@ void sweep_ampiezza()
 
   // ***** PLOT *****
   // Canvas
-  TCanvas *canvas = new TCanvas("canvas", "Resistenza / Generatore -  Sweep ampiezza", 0, 0, width, height);
+  TCanvas *canvas = new TCanvas("canvasFFF", "Resistenza / Generatore -  Sweep ampiezza", 0, 0, width, height);
   canvas->SetWindowSize(width + (width - canvas->GetWw()), height + (height - canvas->GetWh()));
   canvas->SetFillColor(kWhite);
 
@@ -193,8 +197,22 @@ void sweep_ampiezza()
   padResistenza->SetFrameLineWidth(2);
   graphResistenza->GetXaxis()->SetMoreLogLabels();
   graphResistenza->SetMinimum(0);
-  graphResistenza->SetMaximum(3.5);
+  graphResistenza->SetMaximum(4.);
   graphResistenza->Draw("ALP");
+
+  TPaveText *titoloResistenza = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titoloResistenza);
+  titoloResistenza->AddText("Risposta in frequenza - resistenza");
+  titoloResistenza->Draw();
+
+  TPaveText *boxResistenza = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxResistenza);
+  boxResistenza->AddText("Parametri Fit:");
+  boxResistenza->AddText("Rtot = (230.6 +/- 3.8) Ohm");
+  boxResistenza->AddText("Rmis = (148.0 +/- 2.4) Ohm");
+  boxResistenza->AddText("L = (11.96 +/- 0.20) mH");
+  boxResistenza->AddText("C = (170.3 +/- 2.8) nF");
+  boxResistenza->Draw();
 
   // pad Generatore
   padGeneratore->cd();
@@ -204,6 +222,19 @@ void sweep_ampiezza()
   graphTotale->SetMinimum(3.8);
   graphTotale->SetMaximum(5.2);
   graphTotale->Draw("ALP");
+
+  TPaveText *titoloTotale = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titoloTotale);
+  titoloTotale->AddText("Risposta in frequenza - generatore");
+  titoloTotale->Draw();
+
+  TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
+  setGraphicsBox(boxTotale);
+  boxTotale->AddText("Resistenza dal fit:");
+  boxTotale->AddText("R = (224.87 +/- 0.51) Ohm");
+  boxTotale->Draw();
+
+  
 
   canvas->Update();
 }
