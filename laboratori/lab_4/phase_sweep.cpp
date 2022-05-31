@@ -19,6 +19,15 @@
 #include "TPaveStats.h"
 #include "TLatex.h"
 
+//////////////////////////////////
+//                              //
+// !!!! OPERAZIONI DA FARE !!!! //
+//                              //
+// FONT SX = 20                 //
+// FONT DX = 16                 //
+//                              //
+//////////////////////////////////
+
 // VEDI QUESTI PARAMETRI
 constexpr Double_t V0_mis = 5;
 constexpr Double_t L_mis = 11.46 * 1E-3;
