@@ -160,7 +160,7 @@ void phase_sweep()
 
   // ***** MULTIPLOT FIT *****
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Offset");
-  multiGraph->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
+  multiGraph->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (rad)");
   multiGraph->Add(graphResistenza);
   // graphResistenza->SetLineColor(kPink + 1);
   // graphResistenza->SetMarkerColor(kPink + 1);
@@ -193,7 +193,7 @@ void phase_sweep()
 
   // ***** MULTIPLOT OFFSET *****
   TMultiGraph *multiGraphOffset = new TMultiGraph("multiGraphOffset", "Phase Sweep - Offset");
-  multiGraphOffset->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
+  multiGraphOffset->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (rad)");
   multiGraphOffset->Add(graphResistenzaOffset);
   // graphResistenzaOffset->SetLineColor(kPink + 1);
   // graphResistenzaOffset->SetMarkerColor(kPink + 1);

@@ -38,7 +38,7 @@ constexpr Double_t height = 480;
 void setStyle()
 {
   gROOT->SetStyle("Modern"); // BELLE2!!!!!!!!
-  gStyle->SetPadLeftMargin(0.1); 
+  gStyle->SetPadLeftMargin(0.1);
   gStyle->SetPadRightMargin(0.05);
   gStyle->SetOptTitle(0);
   gStyle->SetOptFit(0);
@@ -77,6 +77,44 @@ void setGraphicsGraph(TGraphErrors *graph)
   asseY->SetDecimals();
 
   asseY->SetTitleOffset(1.3);
+  asseY->SetTitleSize(0.04);
+  asseY->SetTitleFont(1);
+
+  asseY->SetLabelFont(1);
+  asseY->SetLabelSize(0.04);
+  asseY->SetLabelOffset(0.01);
+
+  asseY->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie
+  asseY->SetTickLength(0.03);
+}
+
+void setGraphicsMultiplot(TMultiGraph *graph)
+{
+  // *****  ASSE X *****
+  TAxis *asseX = graph->GetXaxis();
+  asseX->CenterTitle();
+  asseX->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+  asseX->SetNoExponent(); // no exp su assi
+
+  asseX->SetTitleOffset(1.3);
+  asseX->SetTitleSize(0.04);
+  asseX->SetTitleFont(2);
+
+  asseX->SetLabelFont(1);
+  asseX->SetLabelSize(0.04);
+  asseX->SetLabelOffset(0.01);
+
+  asseX->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie
+  asseX->SetTickLength(0.03);
+
+  // ***** ASSE Y *****
+  TAxis *asseY = graph->GetYaxis();
+  asseY->CenterTitle();
+  asseY->SetMaxDigits(3); // massimo numero cifre, dopo notazione scientifica
+  asseY->SetNoExponent(); // no exp su assi
+  asseY->SetDecimals();
+
+  asseY->SetTitleOffset(0.6);
   asseY->SetTitleSize(0.04);
   asseY->SetTitleFont(1);
 
@@ -151,7 +189,7 @@ Double_t amp_freq_totale(Double_t *x, Double_t *par)
   return result;
 }
 
-void sweep_ampiezza()
+void amplitude_sweep()
 {
   setStyle();
 
@@ -234,7 +272,70 @@ void sweep_ampiezza()
   boxTotale->AddText("R = (225.9 +/- 1.2) Ohm");
   boxTotale->Draw();
 
-  
+  canvas->Update();
+}
+
+void multiplot()
+{
+  setStyle();
+  gROOT->SetStyle("BELLE2");
+    gStyle->SetPadLeftMargin(0.05);
+  gStyle->SetPadRightMargin(0.03);
+  // ***** LEGGO GRAFICI *****
+  TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
+  graphResistenza->SetTitle("Tensione resistenza; Frequenza (Hz); Tensione (V)");
+  setGraphicsGraph(graphResistenza);
+
+  TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_induttanza.txt", "%lg %lg %lg");
+  graphInduttanza->SetTitle("Tensione induttanza; Frequenza (Hz); Tensione (V)");
+  setGraphicsGraph(graphInduttanza);
+
+  TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_ampiezza/sweep_freq_condensatore.txt", "%lg %lg %lg");
+  graphCondensatore->SetTitle("Tensione condensatore; Frequenza (Hz); Tensione (V)");
+  setGraphicsGraph(graphCondensatore);
+
+  TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
+  graphTotale->SetTitle("Tensione generatore; Frequenza (Hz); Tensione (V)");
+  setGraphicsGraph(graphTotale);
+
+  // ***** MULTIPLOT FIT *****
+  TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep");
+  multiGraph->SetTitle("Risposta in frequenza - tutte le componenti; Frequenza (Hz); Tensione (V)");
+  multiGraph->Add(graphResistenza);
+  graphResistenza->SetLineColor(kPink + 1);
+  graphResistenza->SetMarkerColor(kPink + 1);
+  multiGraph->Add(graphInduttanza);
+  graphInduttanza->SetLineColor(kOrange + 1);
+  graphInduttanza->SetMarkerColor(kOrange + 1);
+  multiGraph->Add(graphCondensatore);
+  graphCondensatore->SetLineColor(kSpring - 6);
+  graphCondensatore->SetMarkerColor(kSpring - 6);
+  multiGraph->Add(graphTotale);
+
+  setGraphicsMultiplot(multiGraph);
+
+  TCanvas *canvas = new TCanvas("canvasSweepAmpiezza", "Sweep Ampiezza", 0, 0, width, height);
+  canvas->SetWindowSize(width + (width - canvas->GetWw()), height + (height - canvas->GetWh()));
+  canvas->SetFillColor(kWhite);
+
+  TPad *pad = new TPad("pad", "Pad", 0., 0., 1., 1., kWhite);
+  pad->Draw();
+
+  pad->cd();
+  pad->SetGridx();
+  pad->SetGridy();
+  pad->SetFrameLineWidth(2);
+  multiGraph->SetMaximum(8);
+  multiGraph->SetMinimum(0);
+  multiGraph->GetXaxis()->SetLimits(0, 20500);
+  multiGraph->Draw("APE");
+
+  pad->BuildLegend();
+
+  TPaveText *titolo = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titolo);
+  titolo->AddText("Risposta in frequenza - tutte le componenti");
+  titolo->Draw();
 
   canvas->Update();
 }
