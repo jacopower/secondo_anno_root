@@ -31,14 +31,14 @@ constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t C_tot = 177 * 1E-9;
 constexpr Double_t C_agg = C_tot - C_mis;
 
-constexpr Double_t width = 1080;
+constexpr Double_t width = 1280;
 constexpr Double_t height = 720;
 
 void setStyle()
 {
-  gROOT->SetStyle("Modern"); // BELLE2!!!!!!!!
-  gStyle->SetPadLeftMargin(0.1);
-  gStyle->SetPadRightMargin(0.05);
+  gROOT->SetStyle("BELLE2"); // BELLE2!!!!!!!!
+  gStyle->SetPadLeftMargin(0.15);
+  gStyle->SetPadRightMargin(0.04);
   gStyle->SetOptTitle(0);
   gStyle->SetOptFit(0);
   gStyle->SetLineScalePS(1);
@@ -82,7 +82,7 @@ void setGraphicsMultiplot(TMultiGraph *graph)
   asseY->SetTitleSize(0.04);
   asseY->SetTitleFont(1);
 
-  asseY->SetLabelFont(1);
+  asseY->SetLabelFont(2);
   asseY->SetLabelSize(0.04);
   asseY->SetLabelOffset(0.01);
 
@@ -132,7 +132,7 @@ void phase_sweep()
 
   // ***** GRAFICI FIT *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_fase/sweep_phase_resistenza.txt", "%lg %lg %lg");
-  graphResistenza->SetTitle("Sweep Resistenza; Frequency (Hz); Phase (RAD)");
+  graphResistenza->SetTitle("Fase resistenza; Frequency (Hz); Phase (RAD)");
   setGraphicsGraph(graphResistenza);
 
   TF1 *funcResistenza = new TF1("funcResistenza", phase_freq_resistenza, 500, 5.5E3, 3); // LIMITI
@@ -142,19 +142,19 @@ void phase_sweep()
   TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
 
   TGraphErrors *graphInduttanza = new TGraphErrors("data/sweep_fase/sweep_phase_induttanza.txt", "%lg %lg %lg");
-  graphInduttanza->SetTitle("Sweep Induttanza; Frequency (Hz); Phase (RAD)");
+  graphInduttanza->SetTitle("Fase induttanza; Frequency (Hz); Phase (RAD)");
   setGraphicsGraph(graphInduttanza);
 
   TGraphErrors *graphCondensatore = new TGraphErrors("data/sweep_fase/sweep_phase_condensatore.txt", "%lg %lg %lg");
-  graphCondensatore->SetTitle("Sweep Condensatore; Frequency (Hz); Phase (RAD)");
+  graphCondensatore->SetTitle("Fase condensatore; Frequency (Hz); Phase (RAD)");
   setGraphicsGraph(graphCondensatore);
 
   // ***** MULTIPLOT FIT *****
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Phase Sweep - Offset");
   multiGraph->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
   multiGraph->Add(graphResistenza);
-  graphResistenza->SetLineColor(kPink + 1);
-  graphResistenza->SetMarkerColor(kPink + 1);
+  // graphResistenza->SetLineColor(kPink + 1);
+  // graphResistenza->SetMarkerColor(kPink + 1);
   multiGraph->Add(graphInduttanza);
   graphInduttanza->SetLineColor(kOrange + 1);
   graphInduttanza->SetMarkerColor(kOrange + 1);
@@ -162,6 +162,12 @@ void phase_sweep()
   graphCondensatore->SetLineColor(kSpring - 6);
   graphCondensatore->SetMarkerColor(kSpring - 6);
   setGraphicsMultiplot(multiGraph);
+  multiGraph->GetXaxis()->SetTitleSize(0.05);
+  multiGraph->GetYaxis()->SetTitleSize(0.05);
+  multiGraph->GetXaxis()->SetTitleOffset(1.);
+  multiGraph->GetYaxis()->SetTitleOffset(1.);
+  multiGraph->GetXaxis()->SetNdivisions(520);
+  multiGraph->GetXaxis()->SetLimits(0, 6100);
 
   // ***** GRAFICI OFFSET *****
   TGraphErrors *graphResistenzaOffset = new TGraphErrors("data/sweep_fase_traslato/resistenza.txt", "%lg %lg %lg");
@@ -180,8 +186,8 @@ void phase_sweep()
   TMultiGraph *multiGraphOffset = new TMultiGraph("multiGraphOffset", "Phase Sweep - Offset");
   multiGraphOffset->SetTitle("Fasi della tensione - Offset; Frequenza (Hz); Fase (RAD)");
   multiGraphOffset->Add(graphResistenzaOffset);
-  graphResistenzaOffset->SetLineColor(kPink + 1);
-  graphResistenzaOffset->SetMarkerColor(kPink + 1);
+  // graphResistenzaOffset->SetLineColor(kPink + 1);
+  // graphResistenzaOffset->SetMarkerColor(kPink + 1);
   multiGraphOffset->Add(graphInduttanzaOffset);
   graphInduttanzaOffset->SetLineColor(kOrange + 1);
   graphInduttanzaOffset->SetMarkerColor(kOrange + 1);
@@ -189,6 +195,9 @@ void phase_sweep()
   graphCondensatoreOffset->SetLineColor(kSpring - 6);
   graphCondensatoreOffset->SetMarkerColor(kSpring - 6);
   setGraphicsMultiplot(multiGraphOffset);
+  multiGraphOffset->GetXaxis()->SetLabelSize(0.03);
+  multiGraphOffset->GetYaxis()->SetLabelSize(0.03);
+  multiGraphOffset->GetXaxis()->SetLimits(0, 21000);
 
   // ***** PLOTTO GRAFICI *****
   TCanvas *canvas = new TCanvas("canvasSweepFase", "Sweep Fase", 0, 0, width, height);
@@ -196,8 +205,8 @@ void phase_sweep()
   canvas->SetFillColor(kWhite);
 
   // Creo le Pad
-  TPad *padFit = new TPad("padFit", "Fit", 0., 0., 0.50, 1., kWhite);
-  TPad *padOffset = new TPad("padOffset", "Offset", 0.50, 0., 1., 1., kWhite);
+  TPad *padFit = new TPad("padFit", "Fit", 0., 0., 0.42, 1., kWhite);
+  TPad *padOffset = new TPad("padOffset", "Offset", 0.42, 0., 1., 1., kWhite);
   padFit->Draw();
   padOffset->Draw();
 
@@ -206,22 +215,32 @@ void phase_sweep()
   padFit->SetGridx();
   padFit->SetGridy();
   padFit->SetFrameLineWidth(2);
-  // multiGraph->SetMaximum();
-  // multiGraph->SetMinimum();
+  multiGraph->SetMaximum(4);
+  multiGraph->SetMinimum(-3);
   multiGraph->Draw("APE");
 
   padFit->BuildLegend();
+
+  TPaveText *titoloFit = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titoloFit);
+  titoloFit->AddText("Fasi tensione misurate");
+  titoloFit->Draw();
 
   // pad OFFSET
   padOffset->cd();
   padOffset->SetGridx();
   padOffset->SetGridy();
   padOffset->SetFrameLineWidth(2);
-  // multiGraphOffset->SetMaximum();
-  // multiGraphOffset->SetMinimum();
+  multiGraphOffset->SetMaximum(2);
+  multiGraphOffset->SetMinimum(-1.5);
   multiGraphOffset->Draw("APE");
 
   padOffset->BuildLegend();
+
+  TPaveText *titoloOffset = new TPaveText(0, 1., .5, .94, "NDC BL");
+  setGraphicsTitolo(titoloOffset);
+  titoloOffset->AddText("Fasi tensione sovrapposte");
+  titoloOffset->Draw();
 
   canvas->Update();
 }
