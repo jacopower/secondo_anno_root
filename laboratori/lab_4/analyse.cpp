@@ -697,7 +697,7 @@ void amplitude_sweep()
   funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
   funcResistenza->SetParNames("R_agg", "L", "C", "R");
   setGraphicsFit(funcResistenza);
-  //TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
 
   // ***** FIT SU INDUTTANZA *****
   TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
