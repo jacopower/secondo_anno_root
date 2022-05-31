@@ -231,7 +231,7 @@ void sweep_ampiezza()
   TPaveText *boxTotale = new TPaveText(1., 1., .7, .7, "NDC, NB"); // NDC=CoordinateRelative NB=noBorders RB=RightBottom
   setGraphicsBox(boxTotale);
   boxTotale->AddText("Resistenza dal fit:");
-  boxTotale->AddText("R = (224.87 +/- 0.51) Ohm");
+  boxTotale->AddText("R = (225.9 +/- 1.2) Ohm");
   boxTotale->Draw();
 
   
