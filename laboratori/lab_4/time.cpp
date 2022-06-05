@@ -27,7 +27,9 @@ void setStyle()
   gStyle->SetPalette(57);
   gStyle->SetOptTitle(0);
   gStyle->SetOptStat(0);
-  gStyle->SetOptFit(0);
+  gStyle->SetOptFit(1111);
+  gStyle->SetPadLeftMargin(0.1);
+  gStyle->SetPadRightMargin(0.03);
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -35,6 +37,7 @@ void setGraphicsGraph(TGraphErrors *graph)
   graph->SetMarkerStyle(kFullCircle);
   graph->SetMarkerColor(kAzure - 1);
   graph->SetLineColor(kAzure - 1);
+  graph->SetLineWidth(3);
   graph->SetMarkerSize(0.9);
 
   // *****  ASSE X *****
@@ -65,11 +68,11 @@ void setGraphicsGraph(TGraphErrors *graph)
   asseY->SetTitleSize(0.04);
   asseY->SetTitleFont(2);
 
-  asseY->SetLabelFont(1);
+  asseY->SetLabelFont(2);
   asseY->SetLabelSize(0.04);
   asseY->SetLabelOffset(0.01);
 
-  asseY->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie
+  asseY->SetNdivisions(510); // 10 divsioni secondarie, 30 divisioni primarie  graphResistenza_fit->GetXaxis()->SetNdivisions(525);
   asseY->SetTickLength(0.03);
 }
 
@@ -133,7 +136,7 @@ void setGraphicsBox(TPaveText *box)
   box->SetBorderSize(1);
   box->SetTextAlign(12);
 }
-
+/*
 Double_t amp_time_resistenza(Double_t *x, Double_t *par)
 {
   Double_t R = par[0];
@@ -144,6 +147,22 @@ Double_t amp_time_resistenza(Double_t *x, Double_t *par)
   Double_t xx = x[0];
   Double_t denominatore = R * R + (TMath::TwoPi() * f * L - 1 / (TMath::TwoPi() * f * C)) * (TMath::TwoPi() * f * L - 1 / (TMath::TwoPi() * f * C));
   Double_t fase = TMath::ATan((1 - TMath::TwoPi() * TMath::TwoPi() * f * f * L * C) / (TMath::TwoPi() * f * R * C)) + par[5];
+  Double_t result = V * R / sqrt(denominatore) * TMath::Sin(TMath::TwoPi() * f * xx + fase);
+  return result;
+}
+*/
+Double_t amp_time_resistenza(Double_t *x, Double_t *par)
+{
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+  Double_t f = par[3];
+  Double_t V = par[4];
+  Double_t Ragg = par[6];
+  Double_t Rtot = R + Ragg + 50.;
+  Double_t xx = x[0];
+  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * f * L - 1 / (TMath::TwoPi() * f * C)) * (TMath::TwoPi() * f * L - 1 / (TMath::TwoPi() * f * C));
+  Double_t fase = TMath::ATan((1 - TMath::TwoPi() * TMath::TwoPi() * f * f * L * C) / (TMath::TwoPi() * f * Rtot * C)) + par[5];
   Double_t result = V * R / sqrt(denominatore) * TMath::Sin(TMath::TwoPi() * f * xx + fase);
   return result;
 }
@@ -250,14 +269,15 @@ void time()
   canvas->SetFillColor(kWhite);
 
   constexpr Double_t R_mis = 150.47;
+  constexpr Double_t R_agg = 30;
   constexpr Double_t L_mis = 11.46 * 1E-3;
   constexpr Double_t C_mis = 157.8 * 1E-9;
   constexpr Double_t V0_mis = 5;
   constexpr Double_t f_mis = 2E3;
 
-  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00479, 6);
-  funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis);
-  funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset");
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_time_resistenza, 0, 0.00479, 7);
+  funcResistenza->SetParameters(R_mis, L_mis, C_mis, f_mis, V0_mis, 0, R_agg);
+  funcResistenza->SetParNames("R", "L", "C", "f", "V", "Offset", "Ragg");
   funcResistenza->SetNpx(10000);
   funcResistenza->FixParameter(3, 2E3);
   funcResistenza->FixParameter(4, 5.0);
@@ -279,6 +299,7 @@ void time()
   padSotto->SetGridx();
   padSotto->SetGridy();
   padSotto->SetFrameLineWidth(2);
+  multiGraph_sotto->GetXaxis()->SetNdivisions(520);
   multiGraph_sotto->SetMaximum(10);
   multiGraph_sotto->SetMinimum(-7);
   multiGraph_sotto->Draw("ALP");
@@ -295,6 +316,7 @@ void time()
   padIn->SetGridx();
   padIn->SetGridy();
   padIn->SetFrameLineWidth(2);
+  multiGraph_in->GetXaxis()->SetNdivisions(526);
   multiGraph_in->SetMaximum(10);
   multiGraph_in->SetMinimum(-7);
   multiGraph_in->Draw("ALP");
@@ -311,6 +333,7 @@ void time()
   padSopra->SetGridx();
   padSopra->SetGridy();
   padSopra->SetFrameLineWidth(2);
+  multiGraph_sopra->GetXaxis()->SetNdivisions(520);
   multiGraph_sopra->SetMaximum(10);
   multiGraph_sopra->SetMinimum(-6);
   multiGraph_sopra->Draw("ALP");

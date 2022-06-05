@@ -40,16 +40,16 @@ constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t C_tot = 177 * 1E-9;
 constexpr Double_t C_agg = C_tot - C_mis;
 
-constexpr Double_t width = 1280;
+constexpr Double_t width = 1440;
 constexpr Double_t height = 720;
 
 void setStyle()
 {
   gROOT->SetStyle("BELLE2"); // BELLE2!!!!!!!!
   gStyle->SetPadLeftMargin(0.15);
-  gStyle->SetPadRightMargin(0.04);
+  gStyle->SetPadRightMargin(0.03);
   gStyle->SetOptTitle(0);
-  gStyle->SetOptFit(0);
+  gStyle->SetOptFit(1111);
   gStyle->SetLineScalePS(1);
 }
 
@@ -214,8 +214,8 @@ void phase_sweep()
   canvas->SetFillColor(kWhite);
 
   // Creo le Pad
-  TPad *padFit = new TPad("padFit", "Fit", 0., 0., 0.42, 1., kWhite);
-  TPad *padOffset = new TPad("padOffset", "Offset", 0.42, 0., 1., 1., kWhite);
+  TPad *padFit = new TPad("padFit", "Fit", 0., 0., 0.40, 1., kWhite);
+  TPad *padOffset = new TPad("padOffset", "Offset", 0.4, 0., 1., 1., kWhite);
   padFit->Draw();
   padOffset->Draw();
 
