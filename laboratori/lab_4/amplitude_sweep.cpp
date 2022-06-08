@@ -32,17 +32,73 @@ constexpr Double_t C_mis = 157.8 * 1E-9;
 constexpr Double_t C_tot = 177 * 1E-9;
 constexpr Double_t C_agg = C_tot - C_mis;
 
-constexpr Double_t width = 1280;
-constexpr Double_t height = 480;
+constexpr Double_t width = 1440;
+constexpr Double_t height = 600;
+
+Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
+{
+  // 4 parametri
+  Double_t L = par[1];
+  Double_t C = par[2];
+  Double_t R = par[3];
+  Double_t Rtot = R + 50. + par[0];
+
+  Double_t xx = x[0];
+
+  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t result = 5. * R / sqrt(denominatore);
+  return result;
+}
+
+Double_t amp_freq_induttanza(Double_t *x, Double_t *par)
+{
+  // 3 parametri
+  Double_t Rtot = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
+  Double_t xx = x[0];
+
+  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t result = TMath::TwoPi() * xx * L * 5.0 / sqrt(denominatore);
+  return result;
+}
+
+Double_t amp_freq_condensatore(Double_t *x, Double_t *par)
+{
+  Double_t Rtot = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
+  Double_t xx = x[0];
+
+  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t result = 5.0 / (TMath::TwoPi() * xx * C) / sqrt(denominatore);
+  return result;
+}
+
+Double_t amp_freq_totale(Double_t *x, Double_t *par)
+{
+  Double_t R = par[0];
+  Double_t L = par[1];
+  Double_t C = par[2];
+
+  Double_t xx = x[0];
+
+  Double_t numeratore = (R - 50.) * (R - 50.) + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t denominatore = R * R + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
+  Double_t result = 5.0 * sqrt(numeratore / denominatore);
+  return result;
+}
 
 void setStyle()
 {
-  gROOT->SetStyle("Modern"); // BELLE2!!!!!!!!
-  gStyle->SetPadLeftMargin(0.1);
-  gStyle->SetPadRightMargin(0.05);
+  gROOT->SetStyle("BELLE2"); // BELLE2!!!!!!!!
+  //gStyle->SetPadLeftMargin(0.07);
+  //gStyle->SetPadRightMargin(0.05);
   gStyle->SetOptTitle(0);
   gStyle->SetOptFit(0);
-  gStyle->SetLineScalePS(1);
+  //gStyle->SetLineScalePS(1);
 }
 
 void setGraphicsGraph(TGraphErrors *graph)
@@ -51,6 +107,7 @@ void setGraphicsGraph(TGraphErrors *graph)
   graph->SetMarkerColor(kAzure - 1);
   graph->SetLineColor(kAzure - 1);
   graph->SetMarkerSize(0.9);
+  graph->SetLineWidth(2);
 
   // *****  ASSE X *****
   TAxis *asseX = graph->GetXaxis();
@@ -60,9 +117,9 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   asseX->SetTitleOffset(1.2);
   asseX->SetTitleSize(0.04);
-  asseX->SetTitleFont(2);
+  //asseX->SetTitleFont(2);
 
-  asseX->SetLabelFont(1);
+  //asseX->SetLabelFont(1);
   asseX->SetLabelSize(0.04);
   asseX->SetLabelOffset(0.01);
 
@@ -78,9 +135,9 @@ void setGraphicsGraph(TGraphErrors *graph)
 
   asseY->SetTitleOffset(1.3);
   asseY->SetTitleSize(0.04);
-  asseY->SetTitleFont(1);
+  //asseY->SetTitleFont(1);
 
-  asseY->SetLabelFont(1);
+  //asseY->SetLabelFont(1);
   asseY->SetLabelSize(0.04);
   asseY->SetLabelOffset(0.01);
 
@@ -98,9 +155,9 @@ void setGraphicsMultiplot(TMultiGraph *graph)
 
   asseX->SetTitleOffset(1.3);
   asseX->SetTitleSize(0.04);
-  asseX->SetTitleFont(2);
+  //asseX->SetTitleFont(2);
 
-  asseX->SetLabelFont(1);
+  //asseX->SetLabelFont(1);
   asseX->SetLabelSize(0.04);
   asseX->SetLabelOffset(0.01);
 
@@ -116,9 +173,9 @@ void setGraphicsMultiplot(TMultiGraph *graph)
 
   asseY->SetTitleOffset(0.6);
   asseY->SetTitleSize(0.04);
-  asseY->SetTitleFont(1);
+ // asseY->SetTitleFont(1);
 
-  asseY->SetLabelFont(1);
+ // asseY->SetLabelFont(1);
   asseY->SetLabelSize(0.04);
   asseY->SetLabelOffset(0.01);
 
@@ -130,6 +187,7 @@ void setGraphicsFit(TF1 *func)
 {
   func->SetLineWidth(3);
   func->SetLineColor(kRed);
+  func->SetMarkerColor(kRed);
 }
 
 void setGraphicsCanvas(TCanvas *c)
@@ -158,35 +216,6 @@ void setGraphicsBox(TPaveText *box)
   box->SetFillColor(kWhite);
   box->SetBorderSize(1);
   box->SetTextAlign(12);
-}
-
-Double_t amp_freq_resistenza(Double_t *x, Double_t *par)
-{
-  // 4 parametri
-  Double_t L = par[1];
-  Double_t C = par[2];
-  Double_t R = par[3];
-  Double_t Rtot = R + 50. + par[0];
-
-  Double_t xx = x[0];
-
-  Double_t denominatore = Rtot * Rtot + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
-  Double_t result = 5. * R / sqrt(denominatore);
-  return result;
-}
-
-Double_t amp_freq_totale(Double_t *x, Double_t *par)
-{
-  Double_t R = par[0];
-  Double_t L = par[1];
-  Double_t C = par[2];
-
-  Double_t xx = x[0];
-
-  Double_t numeratore = (R - 50.) * (R - 50.) + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
-  Double_t denominatore = R * R + (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C)) * (TMath::TwoPi() * xx * L - 1 / (TMath::TwoPi() * xx * C));
-  Double_t result = 5.0 * sqrt(numeratore / denominatore);
-  return result;
 }
 
 void amplitude_sweep()
@@ -238,6 +267,11 @@ void amplitude_sweep()
   graphResistenza->SetMaximum(4.);
   graphResistenza->Draw("ALP");
 
+  auto legendResistenza = new TLegend(0.1, 0.7, 0.48, 0.9);
+  legendResistenza->AddEntry(graphResistenza, "Dati sperimentali");
+  legendResistenza->AddEntry(funcResistenza, "Fit", "l");
+  legendResistenza->Draw();
+
   TPaveText *titoloResistenza = new TPaveText(0, 1., .5, .94, "NDC BL");
   setGraphicsTitolo(titoloResistenza);
   titoloResistenza->AddText("Risposta in frequenza - resistenza");
@@ -261,6 +295,11 @@ void amplitude_sweep()
   graphTotale->SetMaximum(5.2);
   graphTotale->Draw("ALP");
 
+  auto legendGeneratore = new TLegend(0.1, 0.7, 0.48, 0.9);
+  legendGeneratore->AddEntry(graphTotale, "Dati sperimentali");
+  legendGeneratore->AddEntry(funcTotale, "Fit", "l");
+  legendGeneratore->Draw();
+
   TPaveText *titoloTotale = new TPaveText(0, 1., .5, .94, "NDC BL");
   setGraphicsTitolo(titoloTotale);
   titoloTotale->AddText("Risposta in frequenza - generatore");
@@ -278,9 +317,7 @@ void amplitude_sweep()
 void multiplot()
 {
   setStyle();
-  gROOT->SetStyle("BELLE2");
-    gStyle->SetPadLeftMargin(0.05);
-  gStyle->SetPadRightMargin(0.03);
+
   // ***** LEGGO GRAFICI *****
   TGraphErrors *graphResistenza = new TGraphErrors("data/sweep_ampiezza/sweep_freq_resistenza.txt", "%lg %lg %lg");
   graphResistenza->SetTitle("Tensione resistenza; Frequenza (Hz); Tensione (V)");
@@ -297,6 +334,34 @@ void multiplot()
   TGraphErrors *graphTotale = new TGraphErrors("data/sweep_ampiezza/sweep_freq_totale.txt", "%lg %lg %lg");
   graphTotale->SetTitle("Tensione generatore; Frequenza (Hz); Tensione (V)");
   setGraphicsGraph(graphTotale);
+
+  // ***** FIT SULLA RESISTENZA *****
+  TF1 *funcResistenza = new TF1("funcResistenza", amp_freq_resistenza, 2E3, 6E3, 4);
+  funcResistenza->SetParameters(R_agg, L_mis, C_mis, R_mis);
+  funcResistenza->SetParNames("R_agg", "L", "C", "R");
+  setGraphicsFit(funcResistenza);
+  TFitResultPtr rResistenza = graphResistenza->Fit(funcResistenza, "REMSQ");
+
+  // ***** FIT SU INDUTTANZA *****
+  TF1 *funcInduttanza = new TF1("funcInduttanza", amp_freq_induttanza, 3E3, 10E3, 3);
+  funcInduttanza->SetParameters(R_tot, L_mis, C_tot);
+  funcInduttanza->SetParNames("R_tot", "L", "C_tot");
+  setGraphicsFit(funcInduttanza);
+  TFitResultPtr rInduttanza = graphInduttanza->Fit(funcInduttanza, "REMSQ");
+
+  // ***** FIT SU CONDENSATORE *****
+  TF1 *funcCondensatore = new TF1("funcCondensatore", amp_freq_condensatore, 2E3, 4E3, 3);
+  funcCondensatore->SetParameters(R_tot, L_mis, C_mis);
+  funcCondensatore->SetParNames("R_tot", "L", "C_mis");
+  setGraphicsFit(funcCondensatore);
+  TFitResultPtr rCondensatore = graphCondensatore->Fit(funcCondensatore, "REMSQ");
+
+  // ***** FIT SU GENERATORE *****
+  TF1 *funcTotale = new TF1("funcTotale", amp_freq_totale, 2E3, 6E3, 3);
+  funcTotale->SetParameters(R_tot, L_mis, C_mis);
+  funcTotale->SetParNames("Rtot", "L", "C");
+  setGraphicsFit(funcTotale);
+  TFitResultPtr rTotale = graphTotale->Fit(funcTotale, "REMSQ");
 
   // ***** MULTIPLOT FIT *****
   TMultiGraph *multiGraph = new TMultiGraph("multiGraph", "Amplitude Sweep");
@@ -330,7 +395,13 @@ void multiplot()
   multiGraph->GetXaxis()->SetLimits(0, 20500);
   multiGraph->Draw("APE");
 
-  pad->BuildLegend();
+  auto legend = new TLegend(0.1, 0.7, 0.48, 0.9);
+  legend->AddEntry(graphResistenza, "Tensione resistenza");
+  legend->AddEntry(graphInduttanza, "Tensione induttanza");
+  legend->AddEntry(graphCondensatore, "Tensione condensatore");
+  legend->AddEntry(graphTotale, "Tensione generatore");
+  legend->AddEntry(funcResistenza, "Fit", "l");
+  legend->Draw();
 
   TPaveText *titolo = new TPaveText(0, 1., .5, .94, "NDC BL");
   setGraphicsTitolo(titolo);
