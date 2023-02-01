@@ -26,19 +26,19 @@ void myMacro()
 {
   constexpr Int_t nGen = 1E7;
 
-  TH1F *hGen = new TH1F("hGen", "generazione", 1000, 0., 5.);     // creating a histogram (pointer to an histo)
+  TH1F *hGen = new TH1F("hGen", "generazione", 1000, 0., 5.);     // creating a histogram (pointer to an histo) of 1E3 bins in [0,5]
   TH1F *hAcc = new TH1F("hAcc", "accettati", 1000, 0., 5.);       // creating another one
 
   TF1 *f = new TF1("f", "x/5.", 0., 5.);    // creates a functional form (function = x/5) in [0,5]
 
   Double_t x, xRND = 0;
-  for (Int_t i = 0; i < nGen; ++i)
+  for (Int_t i = 0; i < nGen; ++i)        // generating x and filling hGen 1E7 times
   {
     x = gRandom->Exp(1);                  // x is randomly set following a exponential descending distribution
     hGen->Fill(x);                        // a bin of hGen is filled with x
 
     xRND = gRandom->Rndm();               /// xRND is random from uniform distribution in [0,1]
-    if (xRND < f->Eval(x))                // if xRND < x/5, fill hAcc with x
+    if (xRND < f->Eval(x))                // if xRND < x/5 (=f(x))
     {
       hAcc->Fill(x);
     }
@@ -47,16 +47,16 @@ void myMacro()
   TH1F *hEff = new TH1F(*hGen);
   hEff->SetTitle("0bserved Efficiency");
   hEff->SetName("hEff");
-  hEff->Divide(hAcc, hGen, 1, 1, "B");  // B = statistica binomiale //  hEff = h1/h2 (using B?)
+  hEff->Divide(hAcc, hGen, 1, 1, "B");  // B = statistica binomiale //  hEff = h1/h2 (following B?)
 
   TCanvas *canvas = new TCanvas("canvas");        // creating new canvas (where the drawing goes)
   hEff->Draw("H");                                // ???
   hEff->Draw("E, SAME");                          // draws hEff error (uncertanties) bars, on the same graph as before
 
-  TCanvas *c = new TCanvas("c");
+  TCanvas *c = new TCanvas("c");                  // wtf is this needed ???
   c->Divide(1, 2);                                // divide the canvas in a 1x2 grid    
   c->cd(1);                                       // selects the 1st part of the grid
-  hGen->Draw();                                   // ???
+  hGen->Draw();                                   // draw hGen on c, in the grid space 1 ???
   c->cd(2);
   hAcc->Draw();
 }
