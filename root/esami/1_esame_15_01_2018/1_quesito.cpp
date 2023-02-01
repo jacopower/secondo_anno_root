@@ -51,7 +51,7 @@ void myMacro()
 
   TCanvas *canvas = new TCanvas("canvas");        // creating new canvas (where the drawing goes)
   hEff->Draw("H");                                // ???
-  hEff->Draw("E, SAME");                          // draws error bars, on the same graph as before
+  hEff->Draw("E, SAME");                          // draws error (uncertanties) bars, on the same graph as before
 
   TCanvas *c = new TCanvas("c");
   c->Divide(1, 2);                                // divide the canvas in a 1x2 grid    
