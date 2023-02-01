@@ -22,11 +22,11 @@ void myMacro()
 {
   constexpr Int_t nGen = 1E7;
 
-  TH1F *h = new TH1F("h", "histo", 100, 0., 10.);
-  TF1 *f = new TF1("f", "sqrt(x) + x ^2", 0., 10.);
+  TH1F *h = new TH1F("h", "histo", 100, 0., 10.);       // creating histo of 100 bin, in [0,10]
+  TF1 *f = new TF1("f", "sqrt(x) + x ^2", 0., 10.);     // crating a functional form (function=sqrt(x) + x ^2) in [0.10]
 
-  h->FillRandom("f", nGen);
+  h->FillRandom("f", nGen);                             // fill h 1E7 times with random data from the p.d.f. defined in f
 
-  TCanvas *canvas = new TCanvas("canvas");
-  h->Draw();
+  TCanvas *canvas = new TCanvas("canvas");              // creates a canvas
+  h->Draw();                                            // draws h (not needed)
 }
