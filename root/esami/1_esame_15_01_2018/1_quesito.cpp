@@ -50,10 +50,10 @@ void myMacro()
   hEff->Divide(hAcc, hGen, 1, 1, "B");  // B = statistica binomiale //  hEff = h1/h2 (following B?)
 
   TCanvas *canvas = new TCanvas("canvas");        // creating new canvas (where the drawing goes)
-  hEff->Draw("H");                                // ???
+  hEff->Draw("H");                                // draws the histo with a continuous line
   hEff->Draw("E, SAME");                          // draws hEff error (uncertanties) bars, on the same graph as before
 
-  TCanvas *c = new TCanvas("c");                  // wtf is this needed ???
+  TCanvas *c = new TCanvas("c");                  // (wasnt requested...but ok)
   c->Divide(1, 2);                                // divide the canvas in a 1x2 grid    
   c->cd(1);                                       // selects the 1st part of the grid
   hGen->Draw();                                   // draw hGen on c, in the grid space 1 ???
