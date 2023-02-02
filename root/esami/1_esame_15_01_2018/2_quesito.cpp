@@ -32,7 +32,6 @@ Double_t myFunction(Double_t *x, Double_t *par)     // gauss distrib function + 
   Double_t val = par[0] * TMath::Exp(-(xx - par[1]) * (xx - par[1]) / 2. / par[2] / par[2]) + par[3];
   return val;
 }     // par[0] =ampiezza ; par[1] = media ; par[2] = dev st
-      // why par[0] and not just []
 
 
 void myMacro()
@@ -62,22 +61,22 @@ void myMacro()
   hSum->Add(h1, h2, 1, 1);              // hSum = h1 + h2
 
   TF1 *f = new TF1("f", myFunction, 0., 5., 4);     // creating functional form with myFunction in [0,5]
-  f->SetParameters(1, 1, 1, 1);                     // why ???
+  f->SetParameters(1, 1, 1, 1);                     // initializes the parameters of the function
   f->SetLineColor(kRed);
   f->SetLineWidth(1);
 
   TCanvas *canvas = new TCanvas("canvas");
-  hSum->Fit("f");                     // fittin hSum with the user-defined funtion f
+  hSum->Fit("f");                     // fittin f on hSum
   hSum->Draw();                       // draw hSum on canvas
 
-  TCanvas *c = new TCanvas("c");      // wt is that ???
+  TCanvas *c = new TCanvas("c");      // (not requested...but ok)
   c->Divide(1, 2);
   c->cd(1);
   h1->Draw();
   c->cd(2);
   h2->Draw();
 
-  TF1 *fitFunc = hSum->GetFunction("f");            // idk why i need this ???
+  TF1 *fitFunc = hSum->GetFunction("f");            // gets the fitted funcion 
   Double_t ampiezza = fitFunc->GetParameter(0);
   Double_t media = fitFunc->GetParameter(1);
   Double_t stdDev = fitFunc->GetParameter(2);
