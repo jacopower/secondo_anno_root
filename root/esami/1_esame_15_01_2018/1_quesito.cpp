@@ -19,7 +19,7 @@ void setStyle()
 {
   gROOT->SetStyle("Plain");   // the Plain style gives"conventional" Postscript output (the only other style is Default)
   gStyle->SetPalette(57);     // sets the palette called kBird (kCool is num 109)
-  gStyle->SetOptStat(2210);   // prints on screen (graph legend): name; entries; mean; rms(stdev); overflows; underflows; integral; skewness; kurtosis
+  gStyle->SetOptStat(2210);   // prints on screen (graph legend): kurtosis; skewness; integral; overflows; underflows; rms(stdev); mean; entries; name
 }
 
 void myMacro()
