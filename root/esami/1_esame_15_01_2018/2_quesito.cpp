@@ -19,19 +19,19 @@
 
 void setStyle()
 {
-  gROOT->SetStyle("Plain");
-  gStyle->SetPalette(57);
-  gStyle->SetOptStat(2210);
-  gStyle->SetOptFit(1111);
+  gROOT->SetStyle("Plain");   // the Plain style gives"conventional" Postscript output (the only other style is Default)
+  gStyle->SetPalette(57);     // sets the palette called kBird (kCool is num 109)
+  gStyle->SetOptStat(2210);   // prints on screen (graph legend): name; entries; mean; rms(stdev); overflows; underflows; integral; skewness; kurtosis
+  gStyle->SetOptFit(1111);    // prints on screen (graph legend): probability; chisquare; error; value prameters
 }
 
 
-Double_t myFunction(Double_t *x, Double_t *par)     // gauss distrib function + polinomio ( = par[3])
+Double_t myFunction(Double_t *x, Double_t *par)     // gauss distrib function + polinomio ( = par[3]) // x and par are used as arrays for variables and parameters
 {
   Double_t xx = x[0];
   Double_t val = par[0] * TMath::Exp(-(xx - par[1]) * (xx - par[1]) / 2. / par[2] / par[2]) + par[3];
   return val;
-}     // par[0] =ampiezza ; par[1] = media ; par[2] = dev st
+}     // xx=x[0] =variable; par[0] =ampiezza ; par[1] = media ; par[2] = dev st
 
 
 void myMacro()
@@ -51,7 +51,7 @@ void myMacro()
 
   for (Int_t i = 0; i < nGen2; ++i)     // filling h2 ...
   {
-    x2 = gRandom->Uniform(0., 5.);
+    x2 = gRandom->Uniform(0., 5.);      // generating x from a random uniform distribution from 0 to 5
     h2->Fill(x2);
   }
 
@@ -62,8 +62,8 @@ void myMacro()
 
   TF1 *f = new TF1("f", myFunction, 0., 5., 4);     // creating functional form with myFunction in [0,5]
   f->SetParameters(1, 1, 1, 1);                     // initializes the parameters of the function
-  f->SetLineColor(kRed);
-  f->SetLineWidth(1);
+  f->SetLineColor(kRed);                            // sets line color (1 to 5 or color code)
+  f->SetLineWidth(1);                               // sets line with 
 
   TCanvas *canvas = new TCanvas("canvas");
   hSum->Fit("f");                     // fittin f on hSum
