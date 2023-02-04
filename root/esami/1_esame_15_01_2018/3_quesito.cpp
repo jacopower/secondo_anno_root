@@ -13,9 +13,9 @@
 
 void setStyle()
 {
-  gROOT->SetStyle("Plain");
-  gStyle->SetPalette(57);
-  gStyle->SetOptStat(2210);
+  gROOT->SetStyle("Plain");   // the Plain style gives"conventional" Postscript output (the only other style is Default)
+  gStyle->SetPalette(57);     // sets the palette called kBird (kCool is num 109)
+  gStyle->SetOptStat(2210);   // prints on screen (graph legend): kurtosis; skewness; integral; overflows; underflows; rms(stdev); mean; entries; name
 }
 
 void myMacro()
@@ -27,6 +27,6 @@ void myMacro()
 
   h->FillRandom("f", nGen);                             // fill h 1E7 times with random data from the p.d.f. defined in f
 
-  TCanvas *canvas = new TCanvas("canvas");              // creates a canvas
-  h->Draw();                                            // draws h (not needed)
+  TCanvas *canvas = new TCanvas("canvas");              // creates a canvas (ok but not needed)
+  h->Draw();                                            // draws h
 }
