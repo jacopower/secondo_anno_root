@@ -67,16 +67,16 @@ void myMacro()
 
   TCanvas *canvas = new TCanvas("canvas");
   hSum->Fit("f");                     // fittin f on hSum
-  hSum->Draw();                       // draw hSum on canvas
+  hSum->Draw();                       // draw hSum (fitted) on canvas
 
   TCanvas *c = new TCanvas("c");      // (not requested...but ok)
-  c->Divide(1, 2);
-  c->cd(1);
-  h1->Draw();
+  c->Divide(1, 2);                    // divides c in a 1x2 grid
+  c->cd(1);                           // calls grid space n1
+  h1->Draw();                         // draws h1 (in cd(1))
   c->cd(2);
   h2->Draw();
 
-  TF1 *fitFunc = hSum->GetFunction("f");            // gets the fitted funcion 
+  TF1 *fitFunc = hSum->GetFunction("f");            // gets the fitted funcion extracted from the fitted histo hSum
   Double_t ampiezza = fitFunc->GetParameter(0);
   Double_t media = fitFunc->GetParameter(1);
   Double_t stdDev = fitFunc->GetParameter(2);
